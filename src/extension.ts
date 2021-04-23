@@ -1,26 +1,30 @@
 import * as vscode from "vscode";
 import * as express from "express";
-import * as os from "os";
-import * as path from "path";
-import * as fs from "fs";
-import { exec } from "child_process";
-import { ReporterChildNode, ReporterOutput } from "./TestEZ";
-import { TreeItem } from "./TreeItem";
+import { ReporterOutput } from "./TestEZ";
 import { ReporterOutputProvider } from "./ReporterOutputProvider";
 import { FlattenedTestsProvider } from "./FlattenedTestsProvider";
 import { formatPlural } from "./util/formatPlural";
+import { installPlugin } from "./commands/installPlugin";
+import { buildPlugin } from "./commands/buildPlugin";
+import { openTestError } from "./commands/openTestError";
 
 const server = express();
 server.use(express.json());
+
 let currentServer: ReturnType<typeof server["listen"]> | undefined;
+
 let resultsProvider: ReporterOutputProvider | undefined;
 let passedTestProvider: FlattenedTestsProvider | undefined;
 let failedTestProvider: FlattenedTestsProvider | undefined;
 let skippedTestProvider: FlattenedTestsProvider | undefined;
+
 let statusBarButton: vscode.StatusBarItem | undefined;
+
 let outputChannel: vscode.OutputChannel | undefined;
+
 let isRunning = false;
 let wantToRunTests = false;
+
 function getButtonText() {
 	return isRunning
 		? "$(beaker) TestEZ Companion listening"
@@ -46,70 +50,18 @@ export function activate(context: vscode.ExtensionContext) {
 		}),
 		vscode.commands.registerCommand(
 			"testez-companion.openTestError",
-			(item: ReporterChildNode) => {
-				if (outputChannel) {
-					item.errors.forEach((err) =>
-						outputChannel?.appendLine(err)
-					);
-					outputChannel.show();
-				}
+			(item) => {
+				if (outputChannel) openTestError(outputChannel, item);
 			}
 		),
 		vscode.commands.registerCommand(
 			"testez-companion.installPlugin",
-			() => {
-				switch (os.platform()) {
-					case "win32":
-						const destination = path.join(
-							process.env["LOCALAPPDATA"]!,
-							"Roblox",
-							"Plugins",
-							"TestEZ Companion.rbxmx"
-						);
-						const source = path.join(
-							__dirname,
-							"..",
-							"plugin",
-							"TestEZ Companion.rbxmx"
-						);
-
-						fs.copyFile(source, destination, () => {
-							vscode.window.showInformationMessage(
-								"Successfully copied the plugin to Roblox/Plugins/TestEZ Companion.rbxmx"
-							);
-						});
-
-						break;
-					default:
-						console.error(
-							"Could not install the plugin for this OS. Please move the file manually."
-						);
-						break;
-				}
-			}
+			installPlugin
 		),
-		vscode.commands.registerCommand("testez-companion.buildPlugin", () => {
-			vscode.window
-				.showSaveDialog({
-					filters: {
-						"Roblox XML Model Files": ["rbxmx"],
-					},
-				})
-				.then((location) => {
-					if (!location) return;
-
-					exec(
-						"rojo build " +
-							path.resolve(__dirname, "..", "plugin") +
-							' --output="' +
-							location.fsPath +
-							'"',
-						(err) => {
-							if (err) console.error(err);
-						}
-					);
-				});
-		}),
+		vscode.commands.registerCommand(
+			"testez-companion.buildPlugin",
+			buildPlugin
+		),
 		vscode.commands.registerCommand("testez-companion.runTests", () => {
 			wantToRunTests = true;
 		}),
