@@ -1,0 +1,153 @@
+{
+	"name": "testez-companion",
+	"displayName": "TestEZ Companion",
+	"description": "Run TestEZ tests and view their results right from VS Code",
+	"version": "1.0.0",
+	"engines": {
+		"vscode": "^1.55.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"keywords": [
+		"roblox",
+		"testez"
+	],
+	"author": {
+		"name": "tacheometry",
+		"url": "http://github.com/tacheometry/"
+	},
+	"publisher": "tacheometrist",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tacheometry/testez-companion.git"
+	},
+	"activationEvents": [
+		"workspaceContains:*.project.json"
+	],
+	"main": "./dist/extension.js",
+	"scripts": {
+		"vscode:prepublish": "webpack --mode production",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"webpack": "webpack --mode development",
+		"webpack-watch": "webpack --mode development --watch"
+	},
+	"devDependencies": {
+		"@types/express": "^4.17.11",
+		"@types/vscode": "^1.55.0",
+		"ts-loader": "^9.1.0",
+		"typescript": "^4.1.3",
+		"webpack": "^5.35.0",
+		"webpack-cli": "^4.6.0"
+	},
+	"dependencies": {
+		"express": "^4.17.1"
+	},
+	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "testez-companion_container",
+					"title": "TestEZ Companion",
+					"icon": "./icons/beaker.svg"
+				}
+			]
+		},
+		"views": {
+			"testez-companion_container": [
+				{
+					"id": "testez-companion_results",
+					"name": "Test explorer"
+				},
+				{
+					"id": "testez-companion_failingTests",
+					"name": "Failing tests"
+				},
+				{
+					"id": "testez-companion_passingTests",
+					"name": "Passing tests",
+					"visibility": "collapsed"
+				},
+				{
+					"id": "testez-companion_skippedTests",
+					"name": "Skipped tests",
+					"visibility": "collapsed"
+				}
+			]
+		},
+		"menus": {
+			"view/title": [
+				{
+					"command": "testez-companion.runTests",
+					"group": "navigation",
+					"when": "view == testez-companion_results || view == testez-companion_failingTests || view == testez-companion_passingTests || view == testez-companion_skippedTests"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "testez-companion.openTestError",
+					"when": "viewItem == failingTest"
+				}
+			]
+		},
+		"viewsWelcome": [
+			{
+				"view": "testez-companion_results",
+				"contents": "Once tests are run in Studio, a summary of them appears here.\n[Run tests](command:testez-companion.runTests)\nNote: TestEZ Companion must be started to get test results from Studio and for you to be able to run tests from inside VS Code.\n\nAditionally, the Studio plugin must also be installed.\n[Install plugin](command:testez-companion.installPlugin)"
+			}
+		],
+		"commands": [
+			{
+				"title": "Start/stop listening to TestEZ",
+				"command": "testez-companion.toggleServer",
+				"category": "TestEZ Companion",
+				"icon": "$(zap)"
+			},
+			{
+				"title": "Run tests in Studio",
+				"command": "testez-companion.runTests",
+				"category": "TestEZ Companion",
+				"icon": "$(play)"
+			},
+			{
+				"title": "Open test error",
+				"command": "testez-companion.openTestError",
+				"enablement": "viewItem == failingTest"
+			},
+			{
+				"title": "Install Studio plugin",
+				"command": "testez-companion.installPlugin",
+				"category": "TestEZ Companion"
+			},
+			{
+				"title": "Save plugin .rbxmx",
+				"command": "testez-companion.buildPlugin",
+				"category": "TestEZ Companion"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "testez-companion.runTests",
+				"key": "ctrl+;",
+				"mac": "cmd+;"
+			}
+		],
+		"configuration": {
+			"title": "TestEZ Companion",
+			"properties": {
+				"testez-companion.runOnStartup": {
+					"type": "boolean",
+					"default": true,
+					"description": "Whether to start listening for TestEZ results right after the extension boots."
+				},
+				"testez-companion.port": {
+					"type": "integer",
+					"minimum": 1,
+					"default": 28859,
+					"description": "The port to use for receiving data from Studio."
+				}
+			}
+		}
+	}
+}
