@@ -52,13 +52,13 @@ end
 -- seconds
 local POLLING_INTERVAL = 1
 local sinceLastPoll = 0
-RunService.RenderStepped:Connect(function(dt)
+RunService.Heartbeat:Connect(function(dt)
 	if busy == false then
+		sinceLastPoll += dt
+		
 		if sinceLastPoll >= POLLING_INTERVAL then
 			sinceLastPoll -= POLLING_INTERVAL
 			coroutine.wrap(poll)()
 		end
-
-		sinceLastPoll += dt
 	end
 end)
