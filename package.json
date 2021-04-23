@@ -2,7 +2,7 @@
 	"name": "testez-companion",
 	"displayName": "TestEZ Companion",
 	"description": "Run TestEZ tests and view their results right from VS Code",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"engines": {
 		"vscode": "^1.55.0"
 	},
@@ -23,7 +23,12 @@
 		"url": "https://github.com/tacheometry/testez-companion.git"
 	},
 	"activationEvents": [
-		"workspaceContains:*.project.json"
+		"workspaceContains:*.project.json",
+		"onCommand:testez-companion.toggleServer",
+		"onCommand:testez-companion.runTests",
+		"onCommand:testez-companion.openTestError",
+		"onCommand:testez-companion.installPlugin",
+		"onCommand:testez-companion.buildPlugin"
 	],
 	"main": "./dist/extension.js",
 	"scripts": {
