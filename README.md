@@ -29,7 +29,7 @@ This extension contributes the following settings:
 
 ## Known issues (contributions welcome)
 
--   The plugin install command only works on `win32` systems. For installing the plugin on other systems, users will have to drag the `TestEZ Companion.rbxmx` over to Studio, and click `Save as Local Plugin`.
+-   The `testez-inspector.installPlugin` command only works on `win32` systems. For installing the plugin on other systems, users will have to run `command:testez-inspector.buildPlugin`, then drag the `TestEZ Companion.rbxmx` over to Studio, and click `Save as Local Plugin`.
 
 ## Contributing
 
@@ -38,9 +38,3 @@ This extension contributes the following settings:
 -   Run `npm run webpack-watch`
 -   Under the `Run and Debug` tab, click "Run Extension"
 -   After making code changes, press "Restart" in the top menu
-
-## Building the plugin
-
--   Get the repository
--   Change directory to the `plugin` folder
--   Run `rojo build --output="TestEZ Companion.rbxmx"`
