@@ -21,15 +21,23 @@ export const installPlugin = () => {
 
 			fs.copyFile(source, destination, () => {
 				vscode.window.showInformationMessage(
-					"Successfully copied the plugin to Roblox/Plugins/TestEZ Companion.rbxmx"
+					"Successfully copied the plugin to %LOCALAPPDATA%/Roblox/Plugins/TestEZ Companion.rbxmx"
 				);
 			});
 
 			break;
 		default:
-			vscode.window.showErrorMessage(
-				"Could not install the plugin for this OS. Please move the file manually by moving the model file manually."
-			);
+			vscode.window
+				.showErrorMessage(
+					'Could not install the plugin for this OS. Please install it yourself by dragging the rbxmx file into Studio and selecting "Save as Local Plugin".',
+					"Build plugin"
+				)
+				.then((selected) => {
+					if (selected === "Build plugin")
+						return vscode.commands.executeCommand(
+							"testez-companion.buildPlugin"
+						);
+				});
 			break;
 	}
 };

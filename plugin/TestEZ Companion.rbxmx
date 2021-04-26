@@ -5,11 +5,8 @@
     </Properties>
     <Item class="ModuleScript" referent="1">
       <Properties>
-        <string name="Name">TestEZCompanionReporter</string>
-        <string name="Source"><![CDATA[local HttpService = game:GetService("HttpService")
-
-local reporter = {}
-
+        <string name="Name">extractUsefulKeys</string>
+        <string name="Source"><![CDATA[-- WARNING: recursing more than 5000 times will cause a stack overflow. Help wanted
 local function extractUsefulKeys(value, key)
 	if
 		typeof(key) == "string"
@@ -38,103 +35,115 @@ local function extractUsefulKeys(value, key)
 	return value
 end
 
-function reporter.report(results)
-	HttpService:RequestAsync({
-		Url = "http://127.0.0.1:28859/report",
-		Method = "POST",
-		Headers = {
-			["Content-Type"] = "application/json",
-		},
-		Body = HttpService:JSONEncode(extractUsefulKeys(results)),
-	})
-end
-
-return reporter
+return extractUsefulKeys
 ]]></string>
       </Properties>
     </Item>
-    <Item class="ModuleScript" referent="2">
-      <Properties>
-        <string name="Name">hotReload</string>
-        <string name="Source"><![CDATA[local function hotReload(module)
-	return require(module:Clone())
-end
-
-return hotReload
-]]></string>
-      </Properties>
-    </Item>
-    <Item class="Script" referent="3">
+    <Item class="Script" referent="2">
       <Properties>
         <string name="Name">plugin</string>
-        <string name="Source"><![CDATA[local TestEZ = require(script.Parent:WaitForChild("testez")) -- keep in mind this has TestBootstrap modified
-local reporter = require(script.Parent:WaitForChild("TestEZCompanionReporter"))
+        <string name="Source"><![CDATA[local DEBUG = false
+local function debugPrint(...)
+	if DEBUG then
+		print(...)
+	end
+end
+
+local function log(level, ...)
+	if level == "error" then
+		error("[TestEZ Companion", ...)
+	elseif level == "warn" then
+		warn("[TestEZ Companion]", ...)
+	else
+		print("[TestEZ Companion]", ...)
+	end
+end
+
+local TestEZ = require(script.Parent:WaitForChild("testez")) -- keep in mind this has TestBootstrap modified
+local extractUsefulKeys = require(script.Parent:WaitForChild("extractUsefulKeys"))
 
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
+local BASE_URL = "http://127.0.0.1:28859"
+local PlaceId = tostring(game.PlaceId)
 
-local function findTestModule()
-	for _, location in pairs({
-		ReplicatedStorage,
-		ServerScriptService,
-		game:GetService("StarterPlayer").StarterPlayerScripts,
-	}) do
-		for _, child in ipairs(location:GetDescendants()) do
-			if child:IsA("ModuleScript") then
-				if child.Name == "testRunner" then
-					return child
-				end
-			end
-		end
+local function unwrapPath(path)
+	local segments = string.split(path, "/")
+	local lastParent = game
+
+	for _, segment in ipairs(segments) do
+		lastParent = lastParent:FindFirstChild(segment)
 	end
+
+	return lastParent
 end
 
-local busy = false
-local function poll()
-	busy = true
-	local PORT = plugin:GetSetting("port") or 28859
+local function tryRunTestsAndReport(config)
+	local roots = {}
+	for i, rootPath in ipairs(config.roots) do
+		roots[i] = unwrapPath(rootPath)
+	end
 
-	local ok, result = pcall(HttpService.RequestAsync, HttpService, {
-		Url = "http://127.0.0.1:" .. PORT .. "/poll",
-		Method = "HEAD",
+	TestEZ.TestBootstrap:run(roots, {
+		report = function(results)
+			debugPrint("reporting")
+
+			HttpService:RequestAsync({
+				Url = BASE_URL .. "/report",
+				Method = "POST",
+				Headers = {
+					["Content-Type"] = "application/json",
+					["Place-Id"] = PlaceId,
+				},
+				Body = HttpService:JSONEncode(extractUsefulKeys(results)),
+			})
+		end,
+	}, config.otherOptions)
+end
+
+local testsAreRunning = false
+local function alive()
+	local ok, serverInfo = pcall(HttpService.RequestAsync, HttpService, {
+		Url = BASE_URL .. "/poll",
+		Method = "POST",
+		Headers = {
+			["Content-Type"] = "application/json",
+			["Place-Id"] = PlaceId,
+			["Place-Name"] = game.Name,
+		},
 	})
 
-	if ok and result.StatusCode == 200 then
-		local instance = findTestModule()
-
-		if instance then
-			local module = require(instance)
-
-			if typeof(module) ~= "table" then
-				return
-			end
-
-			TestEZ.TestBootstrap:run(module.roots, reporter, module.otherOptions)
-		end
+	if not ok then
+		debugPrint(serverInfo)
+		return
 	end
-	busy = false
+
+	if serverInfo.Headers["please-run-tests"] == "true" and not testsAreRunning then
+		debugPrint("running tests")
+		local decoded = HttpService:JSONDecode(serverInfo.Body)
+		debugPrint(decoded)
+		testsAreRunning = true
+		tryRunTestsAndReport(decoded)
+		testsAreRunning = false
+	end
 end
 
 -- seconds
 local POLLING_INTERVAL = 1
 local sinceLastPoll = 0
 RunService.Heartbeat:Connect(function(dt)
-	if busy == false then
-		sinceLastPoll += dt
-		
-		if sinceLastPoll >= POLLING_INTERVAL then
-			sinceLastPoll -= POLLING_INTERVAL
-			coroutine.wrap(poll)()
-		end
+	sinceLastPoll += dt
+
+	if sinceLastPoll >= POLLING_INTERVAL then
+		sinceLastPoll -= POLLING_INTERVAL
+		alive()
 	end
 end)
 ]]></string>
       </Properties>
     </Item>
-    <Item class="ModuleScript" referent="4">
+    <Item class="ModuleScript" referent="3">
       <Properties>
         <string name="Name">testez</string>
         <string name="Source">local Expectation = require(script.Expectation)
@@ -178,7 +187,7 @@ local TestEZ = {
 
 return TestEZ</string>
       </Properties>
-      <Item class="ModuleScript" referent="5">
+      <Item class="ModuleScript" referent="4">
         <Properties>
           <string name="Name">Context</string>
           <string name="Source"><![CDATA[--[[
@@ -210,7 +219,7 @@ return Context
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="6">
+      <Item class="ModuleScript" referent="5">
         <Properties>
           <string name="Name">Expectation</string>
           <string name="Source"><![CDATA[--[[
@@ -527,7 +536,7 @@ return Expectation
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="7">
+      <Item class="ModuleScript" referent="6">
         <Properties>
           <string name="Name">ExpectationContext</string>
           <string name="Source"><![CDATA[local Expectation = require(script.Parent.Expectation)
@@ -571,7 +580,7 @@ return ExpectationContext
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="8">
+      <Item class="ModuleScript" referent="7">
         <Properties>
           <string name="Name">LifecycleHooks</string>
           <string name="Source"><![CDATA[local TestEnum = require(script.Parent.TestEnum)
@@ -666,11 +675,11 @@ return LifecycleHooks
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Folder" referent="9">
+      <Item class="Folder" referent="8">
         <Properties>
           <string name="Name">Reporters</string>
         </Properties>
-        <Item class="ModuleScript" referent="10">
+        <Item class="ModuleScript" referent="9">
           <Properties>
             <string name="Name">TeamCityReporter</string>
             <string name="Source">local TestService = game:GetService("TestService")
@@ -777,7 +786,7 @@ end
 return TeamCityReporter</string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="11">
+        <Item class="ModuleScript" referent="10">
           <Properties>
             <string name="Name">TextReporter</string>
             <string name="Source">--[[
@@ -888,7 +897,7 @@ end
 return TextReporter</string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="12">
+        <Item class="ModuleScript" referent="11">
           <Properties>
             <string name="Name">TextReporterQuiet</string>
             <string name="Source">--[[
@@ -991,7 +1000,7 @@ return TextReporterQuiet</string>
           </Properties>
         </Item>
       </Item>
-      <Item class="ModuleScript" referent="13">
+      <Item class="ModuleScript" referent="12">
         <Properties>
           <string name="Name">TestBootstrap</string>
           <string name="Source"><![CDATA[--[[
@@ -1045,15 +1054,12 @@ local function toStringPath(tablePath)
 	return stringPath
 end
 
-local hotReload = require(script.Parent.Parent.hotReload)
-
 function TestBootstrap:getModulesImpl(root, modules, current)
 	modules = modules or {}
 	current = current or root
 
 	if isSpecScript(current) then
-		-- local method = require(current)
-		local method = hotReload(current) -- modified for TestEZ inspector
+		local method = require(current)
 		local path = getPath(current, root)
 		local pathString = toStringPath(path)
 
@@ -1069,11 +1075,13 @@ end
 	Find all the ModuleScripts in this tree that are tests.
 ]]
 function TestBootstrap:getModules(root)
+	local clonedRoot = root:Clone() -- modified for TestEZ Companion
+
 	local modules = {}
 
-	self:getModulesImpl(root, modules)
+	self:getModulesImpl(clonedRoot, modules)
 
-	for _, child in ipairs(root:GetDescendants()) do
+	for _, child in ipairs(clonedRoot:GetDescendants()) do
 		self:getModulesImpl(root, modules, child)
 	end
 
@@ -1147,7 +1155,7 @@ return TestBootstrap
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="14">
+      <Item class="ModuleScript" referent="13">
         <Properties>
           <string name="Name">TestEnum</string>
           <string name="Source">--[[
@@ -1180,7 +1188,7 @@ TestEnum.NodeModifier = {
 return TestEnum</string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="15">
+      <Item class="ModuleScript" referent="14">
         <Properties>
           <string name="Name">TestPlan</string>
           <string name="Source"><![CDATA[--[[
@@ -1490,7 +1498,7 @@ return TestPlan
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="16">
+      <Item class="ModuleScript" referent="15">
         <Properties>
           <string name="Name">TestPlanner</string>
           <string name="Source">--[[
@@ -1535,7 +1543,7 @@ end
 return TestPlanner</string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="17">
+      <Item class="ModuleScript" referent="16">
         <Properties>
           <string name="Name">TestResults</string>
           <string name="Source">--[[
@@ -1652,7 +1660,7 @@ end
 return TestResults</string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="18">
+      <Item class="ModuleScript" referent="17">
         <Properties>
           <string name="Name">TestRunner</string>
           <string name="Source"><![CDATA[--[[
@@ -1846,7 +1854,7 @@ return TestRunner
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="19">
+      <Item class="ModuleScript" referent="18">
         <Properties>
           <string name="Name">TestSession</string>
           <string name="Source"><![CDATA[--[[

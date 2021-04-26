@@ -1,7 +1,4 @@
-local HttpService = game:GetService("HttpService")
-
-local reporter = {}
-
+-- WARNING: recursing more than 5000 times will cause a stack overflow. Help wanted
 local function extractUsefulKeys(value, key)
 	if
 		typeof(key) == "string"
@@ -30,15 +27,4 @@ local function extractUsefulKeys(value, key)
 	return value
 end
 
-function reporter.report(results)
-	HttpService:RequestAsync({
-		Url = "http://127.0.0.1:28859/report",
-		Method = "POST",
-		Headers = {
-			["Content-Type"] = "application/json",
-		},
-		Body = HttpService:JSONEncode(extractUsefulKeys(results)),
-	})
-end
-
-return reporter
+return extractUsefulKeys

@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import * as express from "express";
 import { ReporterOutput } from "./TestEZ";
 import { ReporterOutputProvider } from "./ReporterOutputProvider";
 import { FlattenedTestsProvider } from "./FlattenedTestsProvider";
@@ -8,50 +7,72 @@ import { installPlugin } from "./commands/installPlugin";
 import { buildPlugin } from "./commands/buildPlugin";
 import { openTestError } from "./commands/openTestError";
 
-const server = express();
-server.use(express.json());
+import {
+	startServer,
+	runTests,
+	generatePlaceList,
+	testResultsEmitter,
+	placeDisconnectEmitter,
+	setConfigurationForPlace,
+	removeConfigurationForPlace,
+} from "./core";
+import { PlaceList } from "./PlaceList";
+import { configEmitter, getConfig } from "./getConfiguration";
 
-let currentServer: ReturnType<typeof server["listen"]> | undefined;
+startServer();
 
-let resultsProvider: ReporterOutputProvider | undefined;
-let passedTestProvider: FlattenedTestsProvider | undefined;
-let failedTestProvider: FlattenedTestsProvider | undefined;
-let skippedTestProvider: FlattenedTestsProvider | undefined;
+export async function activate(context: vscode.ExtensionContext) {
+	const vscodeConfiguration = vscode.workspace.getConfiguration(
+		"testez-companion"
+	);
 
-let statusBarButton: vscode.StatusBarItem | undefined;
+	const statusBarButton = vscode.window.createStatusBarItem();
+	const outputChannel = vscode.window.createOutputChannel("TestEZ Companion");
 
-let outputChannel: vscode.OutputChannel | undefined;
+	const resultsProvider = new ReporterOutputProvider();
+	const passedTestProvider = new FlattenedTestsProvider("Success");
+	const failedTestProvider = new FlattenedTestsProvider("Failure");
+	const skippedTestProvider = new FlattenedTestsProvider("Skipped");
 
-let isRunning = false;
-let wantToRunTests = false;
+	let selectedPlaceId: string | undefined;
+	function disconnectListeners(place: string) {
+		placeDisconnectEmitter.removeAllListeners(place);
+		testResultsEmitter.removeAllListeners(place);
+	}
+	function setSelectedPlace(place: string) {
+		const config = getConfig();
+		if (!config)
+			return vscode.window.showErrorMessage(
+				"Could not find a testez-companion.toml file."
+			);
 
-function getButtonText() {
-	return isRunning
-		? "$(beaker) TestEZ Companion listening"
-		: "$(beaker) Start TestEZ Companion";
-}
+		if (selectedPlaceId) {
+			removeConfigurationForPlace(selectedPlaceId);
+			disconnectListeners(selectedPlaceId);
+		}
+		selectedPlaceId = place;
 
-export function activate(context: vscode.ExtensionContext) {
-	const configuration = vscode.workspace.getConfiguration("testez-companion");
+		setConfigurationForPlace(selectedPlaceId, config);
 
-	statusBarButton = vscode.window.createStatusBarItem();
-	outputChannel = vscode.window.createOutputChannel("TestEZ Companion");
+		placeDisconnectEmitter.once(selectedPlaceId, (placeInfo) => {
+			selectedPlaceId = undefined;
+			vscode.window.showWarningMessage(
+				`Place ${placeInfo.displayName} disconnected.`
+			);
+			disconnectListeners(place);
+		});
+	}
 
-	resultsProvider = new ReporterOutputProvider();
-	passedTestProvider = new FlattenedTestsProvider("Success");
-	failedTestProvider = new FlattenedTestsProvider("Failure");
-	skippedTestProvider = new FlattenedTestsProvider("Skipped");
+	configEmitter.on("update", (newConfig) => {
+		if (selectedPlaceId)
+			setConfigurationForPlace(selectedPlaceId, newConfig);
+	});
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand("testez-companion.toggleServer", () => {
-			if (isRunning) stopApp();
-			else startApp(context, configuration.get<number>("port", 28859));
-			statusBarButton!.text = getButtonText();
-		}),
 		vscode.commands.registerCommand(
 			"testez-companion.openTestError",
 			(item) => {
-				if (outputChannel) openTestError(outputChannel, item);
+				openTestError(outputChannel, item);
 			}
 		),
 		vscode.commands.registerCommand(
@@ -62,9 +83,67 @@ export function activate(context: vscode.ExtensionContext) {
 			"testez-companion.buildPlugin",
 			buildPlugin
 		),
-		vscode.commands.registerCommand("testez-companion.runTests", () => {
-			wantToRunTests = true;
-		}),
+		vscode.commands.registerCommand(
+			"testez-companion.pickPlace",
+			async () => {
+				const placeList = generatePlaceList();
+
+				if (placeList.length === 0)
+					return vscode.window.showErrorMessage(
+						"No open places detected. Is the plugin running?"
+					);
+
+				const value = await vscode.window.showQuickPick(
+					placeList.map((p) => p.displayName),
+					{
+						canPickMany: false,
+					}
+				);
+				if (!value) return;
+
+				setSelectedPlace(
+					placeList.find((p) => p.displayName === value)!.placeId
+				);
+			}
+		),
+		vscode.commands.registerCommand(
+			"testez-companion.runTests",
+			async () => {
+				if (!selectedPlaceId)
+					await vscode.commands.executeCommand(
+						"testez-companion.pickPlace"
+					);
+				if (!selectedPlaceId) return;
+
+				vscode.window.withProgress(
+					{
+						location: {
+							viewId: "testez-companion_results",
+						},
+						title: "TestEZ",
+					},
+					() =>
+						new Promise<void>((resolve, reject) => {
+							placeDisconnectEmitter.prependOnceListener(
+								selectedPlaceId!,
+								(placeInfo: PlaceList[number]) => {
+									resolve();
+									report(undefined);
+								}
+							);
+							testResultsEmitter.once(
+								selectedPlaceId!,
+								(results) => {
+									resolve();
+									report(results);
+								}
+							);
+						})
+				);
+
+				runTests(selectedPlaceId);
+			}
+		),
 		vscode.window.createTreeView("testez-companion_results", {
 			treeDataProvider: resultsProvider,
 		}),
@@ -81,62 +160,30 @@ export function activate(context: vscode.ExtensionContext) {
 		outputChannel
 	);
 
-	statusBarButton.command = "testez-companion.toggleServer";
-	statusBarButton.text = getButtonText();
-
-	if (configuration.get("runOnStartup"))
-		vscode.commands.executeCommand("testez-companion.toggleServer");
-
 	statusBarButton.show();
-}
 
-function startApp(context: vscode.ExtensionContext, port: number) {
-	isRunning = true;
-	currentServer = server.listen(port);
-
-	server.post("/report", async (req, res) => {
-		try {
-			await report(req.body);
-			res.sendStatus(200);
-		} catch {
-			res.sendStatus(400);
-		}
-	});
-
-	server.head("/poll", async (req, res) => {
-		if (wantToRunTests) {
-			wantToRunTests = false;
-			return res.sendStatus(200);
-		} else return res.sendStatus(403);
-	});
-
-	async function report(data: ReporterOutput) {
-		console.log(data);
-
+	async function report(data?: ReporterOutput) {
 		for (const provider of [
-			resultsProvider!,
-			failedTestProvider!,
-			passedTestProvider!,
-			skippedTestProvider!,
+			resultsProvider,
+			failedTestProvider,
+			passedTestProvider,
+			skippedTestProvider,
 		]) {
 			provider.data = data;
 			provider.refresh();
 		}
-		outputChannel!.appendLine(
-			`===Tests completed===
+
+		if (data) {
+			console.log(data);
+			outputChannel.appendLine(
+				`===Tests completed===
 ${formatPlural(data.successCount, "success", "successes")}
 ${formatPlural(data.failureCount, "failure", "failures")}
 ${formatPlural(data.skippedCount, "skip", "skips")}
 =====================`
-		);
+			);
+		}
 	}
 }
-function stopApp() {
-	currentServer?.close();
-	currentServer = undefined;
-	isRunning = false;
-}
 
-export function deactivate() {
-	stopApp();
-}
+export function deactivate() {}

@@ -1,64 +1,98 @@
+local DEBUG = false
+local function debugPrint(...)
+	if DEBUG then
+		print(...)
+	end
+end
+
+local function log(level, ...)
+	if level == "error" then
+		error("[TestEZ Companion", ...)
+	elseif level == "warn" then
+		warn("[TestEZ Companion]", ...)
+	else
+		print("[TestEZ Companion]", ...)
+	end
+end
+
 local TestEZ = require(script.Parent:WaitForChild("testez")) -- keep in mind this has TestBootstrap modified
-local reporter = require(script.Parent:WaitForChild("TestEZCompanionReporter"))
+local extractUsefulKeys = require(script.Parent:WaitForChild("extractUsefulKeys"))
 
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
+local BASE_URL = "http://127.0.0.1:28859"
+local PlaceId = tostring(game.PlaceId)
 
-local function findTestModule()
-	for _, location in pairs({
-		ReplicatedStorage,
-		ServerScriptService,
-		game:GetService("StarterPlayer").StarterPlayerScripts,
-	}) do
-		for _, child in ipairs(location:GetDescendants()) do
-			if child:IsA("ModuleScript") then
-				if child.Name == "testRunner" then
-					return child
-				end
-			end
-		end
+local function unwrapPath(path)
+	local segments = string.split(path, "/")
+	local lastParent = game
+
+	for _, segment in ipairs(segments) do
+		lastParent = lastParent:FindFirstChild(segment)
 	end
+
+	return lastParent
 end
 
-local busy = false
-local function poll()
-	busy = true
-	local PORT = plugin:GetSetting("port") or 28859
+local function tryRunTestsAndReport(config)
+	local roots = {}
+	for i, rootPath in ipairs(config.roots) do
+		roots[i] = unwrapPath(rootPath)
+	end
 
-	local ok, result = pcall(HttpService.RequestAsync, HttpService, {
-		Url = "http://127.0.0.1:" .. PORT .. "/poll",
-		Method = "HEAD",
+	TestEZ.TestBootstrap:run(roots, {
+		report = function(results)
+			debugPrint("reporting")
+
+			HttpService:RequestAsync({
+				Url = BASE_URL .. "/report",
+				Method = "POST",
+				Headers = {
+					["Content-Type"] = "application/json",
+					["Place-Id"] = PlaceId,
+				},
+				Body = HttpService:JSONEncode(extractUsefulKeys(results)),
+			})
+		end,
+	}, config.otherOptions)
+end
+
+local testsAreRunning = false
+local function alive()
+	local ok, serverInfo = pcall(HttpService.RequestAsync, HttpService, {
+		Url = BASE_URL .. "/poll",
+		Method = "POST",
+		Headers = {
+			["Content-Type"] = "application/json",
+			["Place-Id"] = PlaceId,
+			["Place-Name"] = game.Name,
+		},
 	})
 
-	if ok and result.StatusCode == 200 then
-		local instance = findTestModule()
-
-		if instance then
-			local module = require(instance)
-
-			if typeof(module) ~= "table" then
-				return
-			end
-
-			TestEZ.TestBootstrap:run(module.roots, reporter, module.otherOptions)
-		end
+	if not ok then
+		debugPrint(serverInfo)
+		return
 	end
-	busy = false
+
+	if serverInfo.Headers["please-run-tests"] == "true" and not testsAreRunning then
+		debugPrint("running tests")
+		local decoded = HttpService:JSONDecode(serverInfo.Body)
+		debugPrint(decoded)
+		testsAreRunning = true
+		tryRunTestsAndReport(decoded)
+		testsAreRunning = false
+	end
 end
 
 -- seconds
 local POLLING_INTERVAL = 1
 local sinceLastPoll = 0
 RunService.Heartbeat:Connect(function(dt)
-	if busy == false then
-		sinceLastPoll += dt
-		
-		if sinceLastPoll >= POLLING_INTERVAL then
-			sinceLastPoll -= POLLING_INTERVAL
-			coroutine.wrap(poll)()
-		end
+	sinceLastPoll += dt
+
+	if sinceLastPoll >= POLLING_INTERVAL then
+		sinceLastPoll -= POLLING_INTERVAL
+		alive()
 	end
 end)
