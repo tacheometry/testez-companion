@@ -6,7 +6,7 @@ Run [TestEZ](https://roblox.github.io/testez/) tests and view their results righ
 -   Make a `testez-companion.toml` file to configure how TestEZ should behave:
 
     ```toml
-    	roots = ["ReplicatedStorage/myTests"] # locations of your .spec files (which are found as descendants too)
+    	roots = ["ReplicatedStorage/myTests", "ServerStorage/some/other/tests"] # locations of your .spec files (which are found as descendants too)
     	extraOptions = {} # optional extraOptions for TestBootstrap
     ```
 
