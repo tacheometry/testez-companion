@@ -9,7 +9,7 @@ const placeNames = new Map<string, string>();
 const needToRunTests = new Set<string>();
 const configurations = new Map<string, TomlConfig>();
 
-const ALIVE_TIMEOUT = 1000;
+const ALIVE_TIMEOUT = 2200;
 
 function cleanPlace(placeId: string) {
 	lastAlive.delete(placeId);
