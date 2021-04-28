@@ -1,3 +1,7 @@
+## 1.1.1
+
+-   Better hot reloading. Roots aren't cloned anymore.
+
 ## 1.1.0
 
 -   Out with `testRunner.lua`, in with `testez-companion.toml`

@@ -2,15 +2,13 @@
 
 Run [TestEZ](https://roblox.github.io/testez/) tests and view their results right from VS Code.
 
--   Install the Roblox Studio plugin with either the command or by building it (`plugin` directory)
+-   Install the Roblox Studio plugin with either the command or saving it, adding it to Studio and clicking `Save as Local Plugin` (`command:testez-inspector.buildPlugin`)
 -   Make a `testez-companion.toml` file to configure how TestEZ should behave:
 
     ```toml
     	roots = ["ReplicatedStorage/myTests", "ServerStorage/some/other/tests"] # locations of your .spec files (which are found as descendants too)
     	extraOptions = {} # optional extraOptions for TestBootstrap
     ```
-
-    **WARNING:** Try to make your roots not contain any other instances that you do not need for testing. For example, having only "ServerStorage" as a root will probably cause some lag if you have lots of models inside ServerStorage. As a way to hot reload .spec files and preserve dependencies, roots are cloned each time tests run.
 
 -   Sync into Studio with [Rojo](https://rojo.space/)
 -   Run the tests by pressing the Run button, running the command, or <kbd>Ctrl</kbd>+<kbd>;</kbd> (<kbd>⌘</kbd>+<kbd>;</kbd>)
