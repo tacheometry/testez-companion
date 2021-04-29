@@ -1,6 +1,8 @@
 -- thank you einsteinK
 -- https://devforum.roblox.com/t/is-there-an-easier-way-to-reload-modules-that-have-been-required/61917/8?
 
+local hotReload = {}
+
 local function assertf(c, m, ...)
 	if c then
 		return
@@ -9,7 +11,12 @@ local function assertf(c, m, ...)
 end
 
 local loading, ERR = {}, {}
-local function customRequire(mod)
+
+function hotReload.flush()
+	loading = {}
+end
+
+function hotReload.require(mod)
 	local cached = loading[mod]
 	while cached == false do
 		wait()
@@ -24,7 +31,7 @@ local function customRequire(mod)
 	loading[mod] = false
 	local env = setmetatable({
 		script = mod,
-		require = customRequire,
+		require = hotReload.require,
 	}, { __index = getfenv() })
 	s, e = pcall(setfenv(s, env))
 	if not s then
@@ -35,4 +42,4 @@ local function customRequire(mod)
 	return e
 end
 
-return customRequire
+return hotReload

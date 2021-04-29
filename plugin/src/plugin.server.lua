@@ -15,8 +15,9 @@ local function log(level, ...)
 	end
 end
 
-local TestEZ = require(script.Parent:WaitForChild("testez")) -- keep in mind this has TestBootstrap modified
 local extractUsefulKeys = require(script.Parent:WaitForChild("extractUsefulKeys"))
+local hotReload = require(script.Parent.hotReload)
+local TestEZ = hotReload.require(script.Parent:WaitForChild("testez")) -- If we load it this way it doesn't need to be modified.
 
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
@@ -41,6 +42,7 @@ local function tryRunTestsAndReport(config)
 		roots[i] = unwrapPath(rootPath)
 	end
 
+	hotReload.flush()
 	TestEZ.TestBootstrap:run(roots, {
 		report = function(results)
 			debugPrint("reporting")

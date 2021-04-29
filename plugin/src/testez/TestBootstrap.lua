@@ -49,14 +49,12 @@ local function toStringPath(tablePath)
 	return stringPath
 end
 
-local hotReload = require(script.Parent.Parent.hotReload)
-
 function TestBootstrap:getModulesImpl(root, modules, current)
 	modules = modules or {}
 	current = current or root
 
 	if isSpecScript(current) then
-		local method = hotReload(current) -- modified for TestEZ Companion
+		local method = require(current)
 		local path = getPath(current, root)
 		local pathString = toStringPath(path)
 
