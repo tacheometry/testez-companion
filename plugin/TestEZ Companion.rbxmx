@@ -63,7 +63,7 @@ local function customRequire(mod)
 	if cached then
 		return cached
 	end
-	local s, e = loadstring(mod.Source)
+	local s, e = loadstring(mod.Source, mod:GetFullName())
 	assertf(s, "Parsing error for %s: %s", mod:GetFullName(), tostring(e))
 	loading[mod] = false
 	local env = setmetatable({
@@ -172,10 +172,6 @@ local function alive()
 		testsAreRunning = false
 	end
 end
-
-local module = Instance.new("ModuleScript")
-module.Parent = workspace
-module.Source = "print('cool')"
 
 -- seconds
 local POLLING_INTERVAL = 1
