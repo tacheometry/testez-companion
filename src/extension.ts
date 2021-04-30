@@ -4,7 +4,6 @@ import { ReporterOutputProvider } from "./ReporterOutputProvider";
 import { FlattenedTestsProvider } from "./FlattenedTestsProvider";
 import { formatPlural } from "./util/formatPlural";
 import { installPlugin } from "./commands/installPlugin";
-import { buildPlugin } from "./commands/buildPlugin";
 import { openTestError } from "./commands/openTestError";
 
 import {
@@ -78,10 +77,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand(
 			"testez-companion.installPlugin",
 			installPlugin
-		),
-		vscode.commands.registerCommand(
-			"testez-companion.buildPlugin",
-			buildPlugin
 		),
 		vscode.commands.registerCommand(
 			"testez-companion.pickPlace",
