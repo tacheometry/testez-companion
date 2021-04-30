@@ -22,8 +22,6 @@ function readNow(path: string): TomlConfig | undefined {
 }
 
 function onFileUpdate(path: string) {
-	console.log("update!");
-
 	cache = readNow(path);
 	configEmitter.emit("update", cache);
 }
