@@ -57,7 +57,7 @@ end
 local loading, ERR = {}, {}
 
 function hotReload.flush()
-	loading = {}
+	table.clear(loading)
 end
 
 function hotReload.require(mod)
@@ -112,7 +112,7 @@ end
 
 local extractUsefulKeys = require(script.Parent:WaitForChild("extractUsefulKeys"))
 local hotReload = require(script.Parent.hotReload)
-local TestEZ = hotReload.require(script.Parent:WaitForChild("testez")) -- If we load it this way it doesn't need to be modified.
+local TestEZ = hotReload.require(script.Parent:WaitForChild("testez"))
 
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
