@@ -46,12 +46,11 @@
 	],
 	"main": "./dist/extension.js",
 	"scripts": {
-		"vscode:prepublish": "webpack --mode production",
+		"vscode:prepublish": "npm run buildPlugin && webpack --mode production",
 		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
 		"webpack": "webpack --mode development",
-		"webpack-watch": "webpack --mode development --watch",
-		"buildPlugin": "cd plugin && rojo build --output=\"TestEZ Companion.rbxmx\""
+		"watch": "webpack --mode development --watch",
+		"buildPlugin": "cd plugin && rojo build --output=\"../TestEZ Companion.rbxmx\""
 	},
 	"dependencies": {
 		"chokidar": "^3.5.1",
@@ -156,18 +155,7 @@
 		],
 		"configuration": {
 			"title": "TestEZ Companion",
-			"properties": {
-				"testez-companion.runOnStartup": {
-					"type": "boolean",
-					"default": true,
-					"description": "Whether to start listening for TestEZ results right after the extension boots."
-				},
-				"testez-companion.port": {
-					"type": "integer",
-					"minimum": 1,
-					"default": 28859,
-					"description": "The port to use for receiving data from Studio."
-				}
+			"properties": {}
 			}
 		}
 	}
