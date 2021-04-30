@@ -13,7 +13,7 @@ end
 local loading, ERR = {}, {}
 
 function hotReload.flush()
-	loading = {}
+	table.clear(loading)
 end
 
 function hotReload.require(mod)
