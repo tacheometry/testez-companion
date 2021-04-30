@@ -45,6 +45,8 @@ return extractUsefulKeys
         <string name="Source"><![CDATA[-- thank you einsteinK
 -- https://devforum.roblox.com/t/is-there-an-easier-way-to-reload-modules-that-have-been-required/61917/8?
 
+local hotReload = {}
+
 local function assertf(c, m, ...)
 	if c then
 		return
@@ -53,7 +55,12 @@ local function assertf(c, m, ...)
 end
 
 local loading, ERR = {}, {}
-local function customRequire(mod)
+
+function hotReload.flush()
+	loading = {}
+end
+
+function hotReload.require(mod)
 	local cached = loading[mod]
 	while cached == false do
 		wait()
@@ -68,7 +75,7 @@ local function customRequire(mod)
 	loading[mod] = false
 	local env = setmetatable({
 		script = mod,
-		require = customRequire,
+		require = hotReload.require,
 	}, { __index = getfenv() })
 	s, e = pcall(setfenv(s, env))
 	if not s then
@@ -79,7 +86,7 @@ local function customRequire(mod)
 	return e
 end
 
-return customRequire
+return hotReload
 ]]></string>
       </Properties>
     </Item>
@@ -103,8 +110,9 @@ local function log(level, ...)
 	end
 end
 
-local TestEZ = require(script.Parent:WaitForChild("testez")) -- keep in mind this has TestBootstrap modified
 local extractUsefulKeys = require(script.Parent:WaitForChild("extractUsefulKeys"))
+local hotReload = require(script.Parent.hotReload)
+local TestEZ = hotReload.require(script.Parent:WaitForChild("testez")) -- If we load it this way it doesn't need to be modified.
 
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
@@ -129,6 +137,7 @@ local function tryRunTestsAndReport(config)
 		roots[i] = unwrapPath(rootPath)
 	end
 
+	hotReload.flush()
 	TestEZ.TestBootstrap:run(roots, {
 		report = function(results)
 			debugPrint("reporting")
@@ -172,10 +181,6 @@ local function alive()
 		testsAreRunning = false
 	end
 end
-
-local module = Instance.new("ModuleScript")
-module.Parent = workspace
-module.Source = "print('cool')"
 
 -- seconds
 local POLLING_INTERVAL = 1
@@ -1102,14 +1107,12 @@ local function toStringPath(tablePath)
 	return stringPath
 end
 
-local hotReload = require(script.Parent.Parent.hotReload)
-
 function TestBootstrap:getModulesImpl(root, modules, current)
 	modules = modules or {}
 	current = current or root
 
 	if isSpecScript(current) then
-		local method = hotReload(current) -- modified for TestEZ Companion
+		local method = require(current)
 		local path = getPath(current, root)
 		local pathString = toStringPath(path)
 
