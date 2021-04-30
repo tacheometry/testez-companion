@@ -26,7 +26,7 @@ function hotReload.require(mod)
 	if cached then
 		return cached
 	end
-	local s, e = loadstring(mod.Source)
+	local s, e = loadstring(mod.Source, mod:GetFullName())
 	assertf(s, "Parsing error for %s: %s", mod:GetFullName(), tostring(e))
 	loading[mod] = false
 	local env = setmetatable({
