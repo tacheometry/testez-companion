@@ -3,6 +3,19 @@
 	"displayName": "TestEZ Companion",
 	"description": "Run TestEZ tests and view their results right from VS Code",
 	"icon": "icons/icon.png",
+	"badges": [
+		{
+			"url": "https://img.shields.io/discord/836770519679762474.svg?logo=discord&colorB=7289DA",
+			"href": "https://discord.gg/AtpTzcp4GY",
+			"description": "Support & chat on Discord"
+		},
+		{
+			"url": "https://img.shields.io/github/stars/tacheometry/testez-companion?logo=github",
+			"href": "https://github.com/tacheometry/testez-companion",
+			"description": "GitHub repository"
+		}
+	],
+	"license": "GPL-3.0",
 	"version": "1.1.2",
 	"engines": {
 		"vscode": "^1.55.0"
