@@ -56,7 +56,6 @@
 	"dependencies": {
 		"chokidar": "^3.5.1",
 		"express": "^4.17.1",
-		"open-file-explorer": "^1.0.2",
 		"toml": "^3.0.0"
 	},
 	"devDependencies": {

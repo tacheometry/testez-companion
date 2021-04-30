@@ -1,22 +1,15 @@
 import * as vscode from "vscode";
-import openExplorer from "open-file-explorer";
 import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
 
-function copyPlugin(source: string, destination: string) {
+function copyPlugin(source: string, folder: string) {
+	const destination = path.join(folder, "TestEZ Companion.rbxmx");
+
 	fs.copyFile(source, destination, () => {
-		vscode.window
-			.showInformationMessage(
-				`Successfully copied the plugin to ${destination}`,
-				"View file"
-			)
-			.then((clicked) => {
-				if (clicked === "View file")
-					try {
-						openExplorer(destination, () => {});
-					} catch {}
-			});
+		vscode.window.showInformationMessage(
+			`Successfully copied the plugin to ${destination}`
+		);
 	});
 }
 
@@ -32,12 +25,7 @@ export const installPlugin = () => {
 		case "win32":
 			copyPlugin(
 				pluginPath,
-				path.join(
-					process.env["LOCALAPPDATA"]!,
-					"Roblox",
-					"Plugins",
-					"TestEZ Companion.rbxmx"
-				)
+				path.join(process.env["LOCALAPPDATA"]!, "Roblox", "Plugins")
 			);
 
 			break;
@@ -48,8 +36,7 @@ export const installPlugin = () => {
 					process.env["HOME"]!,
 					"Documents",
 					"Roblox",
-					"Plugins",
-					"TestEZ Companion.rbxmx"
+					"Plugins"
 				)
 			);
 
