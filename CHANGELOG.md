@@ -1,6 +1,7 @@
-## 1.1.1
+## 1.1.2
 
 -   Better hot reloading. Roots aren't cloned anymore.
+-   Fixes the issue where using modules outside of roots does not hot reload them.
 
 ## 1.1.0
 
