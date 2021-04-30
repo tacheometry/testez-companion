@@ -17,7 +17,9 @@ end
 
 local extractUsefulKeys = require(script.Parent:WaitForChild("extractUsefulKeys"))
 local hotReload = require(script.Parent.hotReload)
-local TestEZ = hotReload.require(script.Parent:WaitForChild("testez"))
+
+print(script.Parent:GetChildren())
+local TestEZ = require(script.Parent:WaitForChild("TestEZ"))
 
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")

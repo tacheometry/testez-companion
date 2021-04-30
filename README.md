@@ -43,4 +43,10 @@ _You can also right click on failing "it" blocks to output their errors._
 -   Under the `Run and Debug` tab, click "Run Extension"
 -   After making code changes, press "Restart" in the top menu
 
+### Plugin development
+
 To build the Studio plugin, run `npm run buildPlugin`.
+This requires you to first have cloned the TestEZ GitHub repository, using submodules. To do this run:
+
+1. `git submodule init`
+2. `git submodule update`
