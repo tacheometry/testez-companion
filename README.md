@@ -39,6 +39,8 @@ _You can also right click on failing "it" blocks to output their errors._
 
 -   Get [the repository](https://github.com/tacheometry/testez-companion)
 -   Run `npm i`
--   Run `npm run webpack-watch`
+-   Run `npm run watch`
 -   Under the `Run and Debug` tab, click "Run Extension"
 -   After making code changes, press "Restart" in the top menu
+
+To build the Studio plugin, run `npm run buildPlugin`.

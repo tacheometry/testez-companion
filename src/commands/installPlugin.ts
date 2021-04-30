@@ -14,12 +14,7 @@ function copyPlugin(source: string, folder: string) {
 }
 
 export const installPlugin = () => {
-	const pluginPath = path.join(
-		__dirname,
-		"..",
-		"plugin",
-		"TestEZ Companion.rbxmx"
-	);
+	const pluginPath = path.join(__dirname, "..", "TestEZ Companion.rbxmx");
 
 	switch (os.platform()) {
 		case "win32":

@@ -7,3 +7,5 @@ src/**
 out/**
 webpack.config.js
 node_modules
+plugin/**
+.prettierrc
