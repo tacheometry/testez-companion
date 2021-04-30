@@ -25,7 +25,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		"testez-companion"
 	);
 
-	const statusBarButton = vscode.window.createStatusBarItem();
 	const outputChannel = vscode.window.createOutputChannel("TestEZ Companion");
 
 	const resultsProvider = new ReporterOutputProvider();
@@ -151,11 +150,8 @@ export async function activate(context: vscode.ExtensionContext) {
 		vscode.window.createTreeView("testez-companion_skippedTests", {
 			treeDataProvider: skippedTestProvider,
 		}),
-		statusBarButton,
 		outputChannel
 	);
-
-	statusBarButton.show();
 
 	async function report(data?: ReporterOutput) {
 		for (const provider of [
