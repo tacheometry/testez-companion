@@ -12,12 +12,17 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-            - working-directory: extension
             - uses: actions/setup-node@v1
               with:
+                  working-directory: extension
                   node-version: 14.x
             - run: npm ci
+              with:
+                  working-directory: extension
+
             - run: npm build
+              with:
+                  working-directory: extension
 
     test:
         runs-on: ubuntu-latest
@@ -25,11 +30,12 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-            - working-directory: extension
             - uses: actions/setup-node@v1
               with:
                   node-version: 14.x
             - run: npm ci
+              with:
+                  working-directory: extension
             - run: npm test
 
     prettier:
@@ -42,11 +48,11 @@ jobs:
               with:
                   ref: ${{ github.head_ref }}
                   fetch-depth: 0
-            - working-directory: extension
             - name: Prettify
               uses: creyD/prettier_action@v3.3
               with:
                   prettier_options: --write **/*.{js,ts,md,json}
                   only_changed: True
+                  working-directory: extension
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
