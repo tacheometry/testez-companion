@@ -6,6 +6,19 @@ on:
             - "extension/**"
 
 jobs:
+    build:
+        runs-on: ubuntu-latest
+        name: Bundle with webpack
+
+        steps:
+            - uses: actions/checkout@v2
+            - run: cd extension
+            - uses: actions/setup-node@v1
+              with:
+                  node-version: 14.x
+            - run: npm ci
+            - run: npm build
+
     test:
         runs-on: ubuntu-latest
         name: Run tests
@@ -13,8 +26,7 @@ jobs:
         steps:
             - uses: actions/checkout@v2
             - run: cd extension
-            - name: Use Node.js
-              uses: actions/setup-node@v1
+            - uses: actions/setup-node@v1
               with:
                   node-version: 14.x
             - run: npm ci
@@ -23,12 +35,14 @@ jobs:
     prettier:
         runs-on: ubuntu-latest
         name: Run Prettier
+        needs: build
 
         steps:
             - uses: actions/checkout@v2
               with:
                   ref: ${{ github.head_ref }}
                   fetch-depth: 0
+            - run: cd extension
             - name: Prettify
               uses: creyD/prettier_action@v3.3
               with:
