@@ -1,0 +1,37 @@
+name: VS Code Extension Actions
+
+on:
+    pull_request:
+        paths:
+            - "extension/**"
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        name: Run tests
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use Node.js
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 14.x
+            - run: npm ci
+            - run: npm test
+
+    prettier:
+        runs-on: ubuntu-latest
+        name: Run Prettier
+
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+                  fetch-depth: 0
+            - name: Prettify
+              uses: creyD/prettier_action@v3.3
+              with:
+                  prettier_options: --write **/*.{js,ts,md,json}
+                  only_changed: True
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
