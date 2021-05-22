@@ -1,5 +1,14 @@
 import * as vscode from "vscode";
 
-export async function activate(context: vscode.ExtensionContext) {}
+export async function activate(context: vscode.ExtensionContext) {
+
+
+
+
+
+
+
+
+}
 
 export async function deactivate() {}
