@@ -55,6 +55,7 @@
 		"jasmine-spec-reporter": "^7.0.0",
 		"jasmine-ts": "^0.3.3",
 		"ts-loader": "^9.2.1",
+		"ts-node": "^9.1.1",
 		"webpack": "^5.35.0",
 		"webpack-cli": "^4.6.0"
 	},
