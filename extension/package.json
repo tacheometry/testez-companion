@@ -38,7 +38,7 @@
 	},
 	"main": "./compiledFiles/dist/extension.js",
 	"scripts": {
-		"vscode:prepublish": "npm run package",
+		"vscode:prepublish": "npm run build",
 		"build": "webpack build --mode production --config ./webpack.config.js",
 		"watch": "webpack build --watch --mode development --config ./webpack.config.js",
 		"test": "jasmine-ts --config ./jasmine.json"
@@ -50,7 +50,7 @@
 	},
 	"devDependencies": {
 		"@types/jasmine": "^3.7.4",
-		"@types/vscode": "^1.56.0",
+		"@types/vscode": "^1.55.0",
 		"jasmine": "^3.7.0",
 		"jasmine-spec-reporter": "^7.0.0",
 		"jasmine-ts": "^0.3.3",
