@@ -1,0 +1,162 @@
+{
+	"name": "testez-companion",
+	"displayName": "TestEZ Companion",
+	"description": "Run TestEZ tests and view their results right from VS Code",
+	"icon": "icons/icon.png",
+	"badges": [
+		{
+			"url": "https://img.shields.io/discord/836770519679762474.svg?logo=discord&colorB=7289DA",
+			"href": "https://discord.gg/AtpTzcp4GY",
+			"description": "Support & chat on Discord"
+		},
+		{
+			"url": "https://img.shields.io/github/stars/tacheometry/testez-companion?logo=github",
+			"href": "https://github.com/tacheometry/testez-companion",
+			"description": "GitHub repository"
+		}
+	],
+	"license": "GPL-3.0",
+	"version": "2.0.0",
+	"engines": {
+		"vscode": "^1.55.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"keywords": [
+		"roblox",
+		"testez"
+	],
+	"author": {
+		"name": "tacheometry",
+		"url": "http://github.com/tacheometry/"
+	},
+	"publisher": "tacheometrist",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tacheometry/testez-companion.git"
+	},
+	"main": "./compiledFiles/dist/extension.js",
+	"scripts": {
+		"vscode:prepublish": "npm run package",
+		"build": "webpack build --mode production --config ./webpack.config.js",
+		"watch": "webpack build --watch --mode development --config ./webpack.config.js",
+		"test": "jasmine-ts --config ./jasmine.json"
+	},
+	"dependencies": {
+		"chokidar": "^3.5.1",
+		"fastify": "^3.15.1",
+		"toml": "^3.0.0"
+	},
+	"devDependencies": {
+		"@types/jasmine": "^3.7.4",
+		"@types/vscode": "^1.56.0",
+		"jasmine": "^3.7.0",
+		"jasmine-spec-reporter": "^7.0.0",
+		"jasmine-ts": "^0.3.3",
+		"ts-loader": "^9.2.1",
+		"webpack": "^5.35.0",
+		"webpack-cli": "^4.6.0"
+	},
+	"activationEvents": [
+		"workspaceContains:*.project.json",
+		"onCommand:testez-companion.toggleServer",
+		"onCommand:testez-companion.runTests",
+		"onCommand:testez-companion.openTestError",
+		"onCommand:testez-companion.installPlugin",
+		"onCommand:testez-companion.buildPlugin"
+	],
+	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "testez-companion_container",
+					"title": "TestEZ Companion",
+					"icon": "./icons/testez-companion.svg"
+				}
+			]
+		},
+		"views": {
+			"testez-companion_container": [
+				{
+					"id": "testez-companion_results",
+					"name": "Test explorer"
+				},
+				{
+					"id": "testez-companion_failingTests",
+					"name": "Failing tests"
+				},
+				{
+					"id": "testez-companion_passingTests",
+					"name": "Passing tests",
+					"visibility": "collapsed"
+				},
+				{
+					"id": "testez-companion_skippedTests",
+					"name": "Skipped tests",
+					"visibility": "collapsed"
+				}
+			]
+		},
+		"menus": {
+			"view/title": [
+				{
+					"command": "testez-companion.runTests",
+					"group": "navigation",
+					"when": "view == testez-companion_results || view == testez-companion_failingTests || view == testez-companion_passingTests || view == testez-companion_skippedTests"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "testez-companion.openTestError",
+					"when": "viewItem == failingTest"
+				}
+			]
+		},
+		"viewsWelcome": [
+			{
+				"view": "testez-companion_results",
+				"contents": "Once tests are run in Studio, a summary of them appears here.\n[Run tests](command:testez-companion.runTests)\nNote: TestEZ Companion must be started to get test results from Studio and for you to be able to run tests from inside VS Code.\n\nAditionally, the Studio plugin must also be installed.\n[Install plugin](command:testez-companion.installPlugin)"
+			}
+		],
+		"commands": [
+			{
+				"title": "Run tests in Studio",
+				"command": "testez-companion.runTests",
+				"category": "TestEZ Companion",
+				"icon": "$(play)"
+			},
+			{
+				"title": "Pick testing place",
+				"command": "testez-companion.pickPlace",
+				"category": "TestEZ Companion"
+			},
+			{
+				"title": "Open test error",
+				"command": "testez-companion.openTestError",
+				"enablement": "viewItem == failingTest"
+			},
+			{
+				"title": "Install Studio plugin",
+				"command": "testez-companion.installPlugin",
+				"category": "TestEZ Companion"
+			},
+			{
+				"title": "Save plugin .rbxmx",
+				"command": "testez-companion.buildPlugin",
+				"category": "TestEZ Companion"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "testez-companion.runTests",
+				"key": "ctrl+;",
+				"mac": "cmd+;"
+			}
+		],
+		"configuration": {
+			"title": "TestEZ Companion",
+			"properties": {}
+		}
+	}
+}
