@@ -1,3 +1,4 @@
 compiledFiles
 node_modules
 *.tsbuildinfo
+*.vsix
