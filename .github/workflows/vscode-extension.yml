@@ -18,7 +18,7 @@ jobs:
             - run: npm ci
               working-directory: extension
 
-            - run: npm build
+            - run: npm run build
               working-directory: extension
 
     test:
