@@ -12,7 +12,7 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-            - run: cd extension
+            - working-directory: extension
             - uses: actions/setup-node@v1
               with:
                   node-version: 14.x
@@ -25,7 +25,7 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-            - run: cd extension
+            - working-directory: extension
             - uses: actions/setup-node@v1
               with:
                   node-version: 14.x
@@ -42,7 +42,7 @@ jobs:
               with:
                   ref: ${{ github.head_ref }}
                   fetch-depth: 0
-            - run: cd extension
+            - working-directory: extension
             - name: Prettify
               uses: creyD/prettier_action@v3.3
               with:
