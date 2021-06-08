@@ -6,7 +6,8 @@
 		"sourceMap": false,
 		"rootDir": "src",
 		"strict": true,
-		"incremental": true
+		"incremental": true,
+		"resolveJsonModule": true
 	},
-	"exclude": ["node_modules", "src/tests"]
+	"exclude": ["node_modules", "**/*.spec.ts"]
 }
