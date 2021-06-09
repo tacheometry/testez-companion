@@ -1,3 +1,3 @@
-[submodule "plugin/src/testez"]
-	path = plugin/src/testez
+[submodule "testez"]
+	path = plugin/modules/testez
 	url = https://github.com/Roblox/testez.git

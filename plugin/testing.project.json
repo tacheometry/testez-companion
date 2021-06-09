@@ -1,0 +1,21 @@
+{
+	"name": "TestEZ Companion Testing",
+	"tree": {
+		"$className": "DataModel",
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"TestEZ Companion": {
+				"$path": "src",
+				"TestEZ": {
+					"$path": "modules/testez/src"
+				}
+			},
+			"Tests": {
+				"$path": "tests",
+				"TestEZ": {
+					"$path": "modules/testez/src"
+				}
+			}
+		}
+	}
+}
