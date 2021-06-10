@@ -59,11 +59,10 @@ jobs:
 
       - name: Download Lemur
         uses: actions/checkout@v2
-        working-directory: plugin
         with:
           repository: LPGhatguy/lemur
           ref: "master"
-          path: lemur
+          path: plugin/lemur
           submodules: true
 
       - name: Install Lua
