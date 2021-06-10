@@ -1,0 +1,10 @@
+{
+  "name": "TestEZ Companion",
+  "tree": {
+    "$className": "Folder",
+    "$path": "src",
+    "TestEZ": {
+      "$path": "modules/testez"
+    }
+  }
+}

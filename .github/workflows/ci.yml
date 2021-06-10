@@ -1,0 +1,128 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-extension:
+    name: Bundle Extension
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v2
+
+      - name: Install Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: Install Packages
+        run: npm ci
+        working-directory: extension
+
+      - name: Build Extension
+        run: npm run build
+        working-directory: extension
+
+  test-extension:
+    name: Test Extension
+    runs-on: ubuntu-latest
+    needs: build-extension
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v2
+
+      - name: Install Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: Install Packages
+        run: npm ci
+        working-directory: extension
+
+      - name: Test Extension
+        run: npm test
+        working-directory: extension
+
+  test-plugin:
+    name: Test Plugin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Download Lemur
+        uses: actions/checkout@v2
+        working-directory: plugin
+        with:
+          repository: LPGhatguy/lemur
+          ref: "master"
+          path: lemur
+          submodules: true
+
+      - name: Install Lua
+        uses: leafo/gh-actions-lua@v8
+        with:
+          luaVersion: "5.1"
+
+      - name: Install LuaRocks
+        uses: leafo/gh-actions-luarocks@v4
+
+      - name: Install Lua Dependencies
+        run: |
+          luarocks install luacov
+          luarocks install luacov-reporter-lcov
+          luarocks install luafilesystem
+          luarocks install dkjson
+          luarocks install luasocket
+          luarocks install bit32
+
+      - name: Test Plugin
+        working-directory: plugin
+        run: |
+          lua -lluacov tests/Lemur.server.lua
+          luacov -r lcov
+
+      - name: Report Coverage
+        uses: coverallsapp/github-action@v1.1.2
+        working-directory: plugin
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: luacov.report.out
+
+  test-plugin-roblox:
+    name: Test Plugin in Roblox
+    if: github.event_name == 'push'
+    needs: test-plugin
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Install Foreman
+        uses: Roblox/setup-foreman@v1
+        working-directory: plugin
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Roblox
+        uses: OrbitalOwen/roblox-win-installer-action@1.1
+        with:
+          cookie: ${{ secrets.ROBLOSECURITY || '_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_A293A7DBE35F8BCF906689DECD6726E783BBE6B331AB7313109C611DE40FB6EC2477F6403C1CCB5DBD1E07164546B8D7457EAC598E0DA5D4BEC983F0A951F326D7FD7DC12CF279CEA78FBD21FCBB9354EF573C03A9ECC6DE188F12B3CA3C07B5F043F8A0E470AA9C18BAF9C5B5300763AACD2A1965FA71704B22496F0ED798EE022813A9053940F1697A67A8814E7F46180985A5292AA87E44B3AAD205C8850B00511E9DC9A3359E240D3FDA0F72310C9474AFCB3E3CAA80E5FD7B44A7B3A13EF3D5825F2CF6C0051572E27D283BBB0CBA7B1E39C820B07EBE6E1297D54D6854A07BDFC9ABB7F0725BECA782A719447F246033846374EB701C925B35B4F696BB6568A2A5B58A1BBECB01028A17133908759C9A4FE5254F6A2782AF28CEB0C567E6E51AA29B0990914AB99068A3D942217A48DF2E' }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Plugin
+        working-directory: plugin
+        run: rojo build -o build.rbxlx testing.project.json
+
+      - name: Test Plugin
+        working-directory: plugin
+        run: run-in-roblox --place build.rbxlx --script tests/Run.server.lua
