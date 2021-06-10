@@ -64,7 +64,7 @@ end
 
 -- Load variables dependent on the build
 local ReplicatedStorage = Habitat.game:GetService("ReplicatedStorage")
-local Tests = Habitat:require(Habitat.script.Parent:WaitForChild("Tests"))
+local Tests = Habitat:require(ReplicatedStorage:WaitForChild("Tests"):WaitForChild("Tests"))
 local Roots = { ReplicatedStorage.Tests }
 
 -- Run tests and set up exit status
