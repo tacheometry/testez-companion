@@ -110,6 +110,10 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Install Foreman Tooling
+        working-directory: plugin
+        run: foreman install
+
       - name: Install Roblox
         uses: OrbitalOwen/roblox-win-installer-action@1.1
         with:
