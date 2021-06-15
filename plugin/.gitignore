@@ -1,1 +1,16 @@
+# Roblox builds and artifacts
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+*.rbxl.lock
+*.rbxlx.lock
+
+# LuaCov reports
+/luacov.*
+
+# Lua packages
+/lemur*
+
+# Selene configuration
 roblox.toml

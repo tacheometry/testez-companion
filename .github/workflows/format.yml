@@ -1,0 +1,23 @@
+name: Formatting
+
+on:
+  pull_request:
+
+jobs:
+  prettier:
+    name: Run Prettier
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Prettify
+        uses: creyD/prettier_action@v3.3
+        with:
+          prettier_options: --write **/*.{js,ts,md,json}
+          only_changed: True
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
