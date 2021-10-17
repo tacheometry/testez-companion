@@ -1,7 +1,7 @@
-import TestEZ from "../TestEZ";
+import TestEZ from "../TestEZTypes";
 import testSummaryTreeDataProvider from "./testSummaryTreeDataProvider";
 
-import * as SAMPLE_DATA from "../sampleTestEZOutput.json";
+import SAMPLE_DATA from "../sampleTestEZOutput";
 
 describe("testResultsProvider", () => {
 	let provider: testSummaryTreeDataProvider;

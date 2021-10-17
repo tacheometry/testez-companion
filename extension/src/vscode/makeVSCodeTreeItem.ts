@@ -1,4 +1,4 @@
-import TestEZ from "../TestEZ";
+import TestEZ from "../TestEZTypes";
 import type * as vscode from "vscode";
 
 export default function makeTreeItem(

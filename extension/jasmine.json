@@ -8,5 +8,6 @@
 		}
 	],
 	"spec_dir": "src",
-	"spec_files": ["**/*.spec.ts"]
+	"spec_files": ["**/*.spec.ts"],
+	"random": false
 }

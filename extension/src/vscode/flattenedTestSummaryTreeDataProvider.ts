@@ -1,4 +1,4 @@
-import TestEZ from "../TestEZ";
+import TestEZ from "../TestEZTypes";
 import * as vscode from "vscode";
 
 import testSummaryTreeDataProvider from "./testSummaryTreeDataProvider";

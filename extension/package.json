@@ -36,17 +36,18 @@
 		"type": "git",
 		"url": "https://github.com/tacheometry/testez-companion.git"
 	},
-	"main": "./compiledFiles/dist/extension.js",
+	"main": "./dist/extension.js",
 	"scripts": {
 		"vscode:prepublish": "npm run build",
 		"build": "webpack build --mode production --config ./webpack.config.js",
-		"watch": "webpack build --watch --mode development --config ./webpack.config.js",
+		"watch": "webpack watch --mode development --config ./webpack.config.js",
 		"test": "jasmine-ts --config ./jasmine.json",
-		"test:watch": "nodemon --ext ts --exec \"npm test\""
+		"test:watch": "nodemon --ext ts --exec \"npm test\"",
+		"package": "vsce package"
 	},
 	"dependencies": {
-		"@reduxjs/toolkit": "^1.5.1",
-		"chokidar": "^3.5.1",
+		"ajv": "^6.12.6",
+		"axios": "^0.22.0",
 		"fastify": "^3.15.1",
 		"redux": "^4.1.0",
 		"toml": "^3.0.0"
@@ -54,25 +55,34 @@
 	"devDependencies": {
 		"@types/jasmine": "^3.7.4",
 		"@types/vscode": "^1.55.0",
-		"axios": "^0.21.1",
 		"jasmine": "^3.7.0",
 		"jasmine-spec-reporter": "^7.0.0",
 		"jasmine-ts": "^0.3.3",
+		"nodemon": "^2.0.13",
 		"ts-loader": "^9.2.1",
 		"ts-node": "^9.1.1",
 		"typescript": "^4.2.4",
+		"vsce": "^1.100.1",
 		"webpack": "^5.35.0",
 		"webpack-cli": "^4.6.0"
 	},
 	"activationEvents": [
 		"workspaceContains:*.project.json",
-		"onCommand:testez-companion.toggleServer",
 		"onCommand:testez-companion.runTests",
-		"onCommand:testez-companion.openTestError",
 		"onCommand:testez-companion.installPlugin",
 		"onCommand:testez-companion.buildPlugin"
 	],
 	"contributes": {
+		"configuration": {
+			"title": "TestEZ Companion",
+			"properties": {
+				"testez-companion.timeout": {
+					"type": "number",
+					"default": 5,
+					"description": "The time (in seconds) it takes to cancel testing after no response has been received from the Roblox Studio extension."
+				}
+			}
+		},
 		"viewsContainers": {
 			"activitybar": [
 				{
@@ -133,16 +143,6 @@
 				"icon": "$(play)"
 			},
 			{
-				"title": "Pick testing place",
-				"command": "testez-companion.pickPlace",
-				"category": "TestEZ Companion"
-			},
-			{
-				"title": "Open test error",
-				"command": "testez-companion.openTestError",
-				"enablement": "viewItem == failingTest"
-			},
-			{
 				"title": "Install Studio plugin",
 				"command": "testez-companion.installPlugin",
 				"category": "TestEZ Companion"
@@ -151,6 +151,16 @@
 				"title": "Save plugin .rbxmx",
 				"command": "testez-companion.buildPlugin",
 				"category": "TestEZ Companion"
+			},
+			{
+				"title": "Select place",
+				"command": "testez-companion.selectPlace",
+				"category": "TestEZ Companion"
+			},
+			{
+				"title": "Open test error",
+				"command": "testez-companion.openTestError",
+				"enablement": "viewItem == failingTest"
 			}
 		],
 		"keybindings": [
@@ -159,10 +169,6 @@
 				"key": "ctrl+;",
 				"mac": "cmd+;"
 			}
-		],
-		"configuration": {
-			"title": "TestEZ Companion",
-			"properties": {}
-		}
+		]
 	}
 }

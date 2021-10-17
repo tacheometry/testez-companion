@@ -7,7 +7,8 @@
 		"rootDir": "src",
 		"strict": true,
 		"incremental": true,
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"esModuleInterop": true
 	},
 	"exclude": ["node_modules", "**/*.spec.ts"]
 }

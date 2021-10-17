@@ -10,7 +10,7 @@ const config = {
 
 	entry: "./src/extension.ts", // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
 	output: {
-		path: path.resolve(__dirname, "compiledFiles/dist"),
+		path: path.resolve(__dirname, "dist"),
 		filename: "extension.js",
 		libraryTarget: "commonjs2",
 		devtoolModuleFilenameTemplate: "../[resource-path]",

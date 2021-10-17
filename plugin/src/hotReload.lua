@@ -1,5 +1,5 @@
 -- thank you einsteinK
--- https://devforum.roblox.com/t/is-there-an-easier-way-to-reload-modules-that-have-been-required/61917/8
+-- https://devforum.roblox.com/t/61917/8
 
 local hotReload = {}
 

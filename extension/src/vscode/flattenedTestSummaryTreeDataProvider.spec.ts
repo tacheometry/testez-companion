@@ -1,16 +1,13 @@
-import TestEZ from "../TestEZ";
+import TestEZ from "../TestEZTypes";
 import flattenedTestsProvider from "./flattenedTestSummaryTreeDataProvider";
-import * as SAMPLE_DATA from "../sampleTestEZOutput.json";
+import SAMPLE_DATA from "../sampleTestEZOutput";
 
 describe("flattenedTestResultsProvider", () => {
 	let provider: flattenedTestsProvider;
 	let children: TestEZ.ReporterChildNode[];
 
 	beforeEach(async () => {
-		provider = new flattenedTestsProvider(
-			"Failure",
-			SAMPLE_DATA as TestEZ.ReporterOutput
-		);
+		provider = new flattenedTestsProvider("Failure", SAMPLE_DATA);
 		children = (await provider.getChildren())!;
 	});
 

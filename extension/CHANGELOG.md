@@ -1,3 +1,12 @@
+## 2.0.0
+
+-   Rewrite of the extension/plugin.
+-   Studio console logs are now sent to the `Output` tab in VS Code. Test errors are printed here too.
+-   The HTTP server to communicate with Studio (`http://localhost:28859`) is now only open while running tests - previously it was open for the entire duration of the extension being active.
+-   The `testez-companion.toml` file's contents are now validated.
+-   The Studio plugin no longer errors when running the game.
+-
+
 ## 1.1.2
 
 -   Better hot reloading. Roots aren't cloned anymore.

@@ -1,4 +1,4 @@
-import TestEZ from "../TestEZ";
+import TestEZ from "../TestEZTypes";
 import type * as vscode from "vscode";
 import getIconPath from "../util/getIconPath";
 import makeTreeItem from "./makeVSCodeTreeItem";
@@ -7,9 +7,6 @@ import makeTreeItem from "./makeVSCodeTreeItem";
 const CollapsibleStateNone = 0;
 const CollapsibleStateCollapsed = 1;
 const CollapsibleStateExpanded = 2;
-
-type o =
-	vscode.TreeDataProvider<TestEZ.ReporterChildNode>["onDidChangeTreeData"];
 
 export default class testSummaryTreeDataProvider
 	implements vscode.TreeDataProvider<TestEZ.ReporterChildNode>
