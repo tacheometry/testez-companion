@@ -11,9 +11,11 @@ local function assertf(c, m, ...)
 end
 
 local loading, ERR = {}, {}
+local globalTable = {}
 
 function hotReload.flush()
 	table.clear(loading)
+	table.clear(globalTable)
 end
 
 function hotReload.require(mod)
@@ -32,7 +34,10 @@ function hotReload.require(mod)
 	local env = setmetatable({
 		script = mod,
 		require = hotReload.require,
-	}, { __index = getfenv() })
+		_G = globalTable,
+	}, {
+		__index = getfenv(),
+	})
 	s, e = pcall(setfenv(s, env))
 	if not s then
 		loading[mod] = ERR
