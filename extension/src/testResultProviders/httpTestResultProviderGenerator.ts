@@ -143,10 +143,7 @@ export default (
 					},
 				},
 				handler: async (request, reply) => {
-					console.log("Got log");
 					if (testResults) return reply.status(403).send();
-					console.log("Log getting through");
-					console.log(request.body);
 
 					onLogReceived(request.body as Log);
 					reply.code(200).send();
