@@ -1,3 +1,9 @@
+## 2.1.0
+
+-   Dependency updates.
+-   Option to run tests automatically on save of `lua`/`luau` files.
+-   Overall documentation updates.
+
 ## 2.0.0
 
 -   Rewrite of the extension/plugin.
@@ -5,7 +11,6 @@
 -   The HTTP server to communicate with Studio (`http://localhost:28859`) is now only open while running tests - previously it was open for the entire duration of the extension being active.
 -   The `testez-companion.toml` file's contents are now validated.
 -   The Studio plugin no longer errors when running the game.
--
 
 ## 1.1.2
 
