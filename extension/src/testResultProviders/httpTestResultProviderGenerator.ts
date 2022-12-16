@@ -102,6 +102,7 @@ export default (
 						type: "object",
 					},
 					headers: {
+						type: "object",
 						properties: {
 							["place-guid"]: {
 								type: "string",
