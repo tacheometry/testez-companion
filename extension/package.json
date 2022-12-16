@@ -74,6 +74,11 @@
 					"type": "number",
 					"default": 5,
 					"description": "The time (in seconds) it takes to cancel testing after no response has been received from the Roblox Studio extension."
+				},
+				"testez-companion.runTestsOnSave": {
+					"type": "boolean",
+					"default": false,
+					"description": "Whether to run tests whenever a lua/luau file in the project is changed."
 				}
 			}
 		},

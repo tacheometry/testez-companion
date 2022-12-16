@@ -1,6 +1,3 @@
-import * as vscode from "vscode";
+import getExtensionConfiguration from "./getExtensionConfiguration";
 
-export default () =>
-	(vscode.workspace.getConfiguration("testez-companion").timeout as
-		| number
-		| undefined) ?? 5;
+export default () => getExtensionConfiguration().get<number>("timeout") ?? 5;
