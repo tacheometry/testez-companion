@@ -126,7 +126,7 @@
 		"viewsWelcome": [
 			{
 				"view": "testez-companion_results",
-				"contents": "Once tests are run in Studio, a summary of them appears here.\n[Run tests](command:testez-companion.runTests)\nNote: TestEZ Companion must be started to get test results from Studio and for you to be able to run tests from inside VS Code.\n\nAditionally, the Studio plugin must also be installed.\n[Install plugin](command:testez-companion.installPlugin)"
+				"contents": "Once tests are run in Studio, a summary of them appears here.\n[Run tests](command:testez-companion.runTests)\nThe TestEZ Companion plugin for Roblox Studio must be installed, and must be running to be able to receive test results.\nAfter installing, the game place might need to be reopened, or Studio might need to be restarted.\nVisit [the extension page](https://marketplace.visualstudio.com/items?itemName=tacheometrist.testez-companion) for more information on setting up.\n[Install plugin](command:testez-companion.installPlugin)"
 			}
 		],
 		"commands": [
