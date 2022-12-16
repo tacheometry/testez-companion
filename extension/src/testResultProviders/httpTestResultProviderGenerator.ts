@@ -153,7 +153,9 @@ export default (
 				},
 			});
 
-			server.listen(port);
+			server.listen({
+				port,
+			});
 
 			setTimeout(async () => {
 				selectedPlace = await getPlaceToTestOn(placeInfo);

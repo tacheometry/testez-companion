@@ -1,9 +1,9 @@
 import {
 	applyMiddleware,
-	createStore,
 	Middleware,
 	Store,
 	Dispatch,
+	legacy_createStore,
 } from "redux";
 import { IStoreAction, IStoreState } from "./store/StoreTypes";
 import * as vscode from "vscode";
@@ -174,7 +174,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		return next(action);
 	};
 
-	store = createStore(reducer, applyMiddleware(sideEffectMiddleware));
+	store = legacy_createStore(reducer, applyMiddleware(sideEffectMiddleware));
 }
 
 export async function deactivate() {}
