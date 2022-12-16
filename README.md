@@ -66,3 +66,7 @@ On macOS, the location of Studio plugins is `~/Documents/Roblox/Plugins`.
    rojo serve testing.project.json
    ```
 2. Under `ReplicatedStorage`, right click the `TestEZ Companion` folder, and select `Save as Local Plugin...`. Selecting `Save to File...`, and saving the `rbxm*` model in your plugin directory also works.
+
+## Test place
+
+A basic place to test the functionality of spec files is https://github.com/tacheometry/testez-basic-place.
