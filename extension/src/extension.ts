@@ -16,11 +16,18 @@ import testSummaryTreeDataProvider from "./vscode/testSummaryTreeDataProvider";
 import TestEZ from "./TestEZTypes";
 import reducer from "./store/reducer";
 import Log from "./LogServiceMessage";
+import fsWatcherCallback from "./vscode/fsWatcherCallback";
 
 export let store: Store<IStoreState, IStoreAction>;
 
 export async function activate(context: vscode.ExtensionContext) {
 	const outputChannel = vscode.window.createOutputChannel("TestEZ Companion");
+	const fsWatcher = vscode.workspace.createFileSystemWatcher(
+		"**/*.lua*",
+		false,
+		false,
+		false
+	);
 
 	const testTreeDataProviders: testSummaryTreeDataProvider[] = (
 		["Success", "Failure", "Skipped"] as const
@@ -63,8 +70,13 @@ export async function activate(context: vscode.ExtensionContext) {
 				testTreeDataProviders[i]
 			)
 		),
-		outputChannel
+		outputChannel,
+		fsWatcher
 	);
+
+	fsWatcher.onDidChange(fsWatcherCallback);
+	fsWatcher.onDidCreate(fsWatcherCallback);
+	fsWatcher.onDidDelete(fsWatcherCallback);
 
 	let progressBarPromiseResolver: (() => void) | undefined;
 	const stopProgressBar = () => progressBarPromiseResolver?.();

@@ -42,7 +42,14 @@ const configFileSchema = {
 };
 
 const validatorFunc = ajv.compile(configFileSchema);
-export default async () => {
+/**
+ * @param runAutomatically Used when this command is called by the run tests on save feature. Maybe the user does not have or intend to have the extension set up in the current project, so only bug them if running tests has been initiated explicitly.
+ */
+export default async (runAutomatically?: boolean) => {
+	const optionallyShowError = (e: string) => {
+		if (!runAutomatically) vscode.window.showErrorMessage(e);
+	};
+
 	if (store.getState().waitingForTestResults)
 		return vscode.window.showInformationMessage(
 			"Can't start running tests before the currently running tests finish."
@@ -50,9 +57,7 @@ export default async () => {
 
 	const workspaceFolder = getWorkspaceFolder();
 	if (!workspaceFolder) {
-		return vscode.window.showErrorMessage(
-			"Could not find a workspace folder."
-		);
+		return optionallyShowError("Could not find a workspace folder.");
 	}
 
 	const configPath = vscode.Uri.joinPath(
@@ -68,7 +73,7 @@ export default async () => {
 			})
 		);
 	} catch (e) {
-		return vscode.window.showErrorMessage(
+		return optionallyShowError(
 			`Couldn't parse/read from testez-companion.toml (${configPath}).`
 		);
 	}
