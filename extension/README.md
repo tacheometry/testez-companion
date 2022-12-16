@@ -24,7 +24,7 @@ Run [TestEZ](https://roblox.github.io/testez/) tests and view their results righ
     ```
 
 -   Sync your scripts into Studio with [Rojo](https://rojo.space/)
--   Run the tests by pressing the Run button, the command, or <kbd>Ctrl</kbd>+<kbd>;</kbd>
+-   Run the tests by pressing the Run button, the command, <kbd>Ctrl</kbd>+<kbd>;</kbd>, or by enabling the `runTestsOnSave` setting.
 -   See the results!
 
 _You can also right click on failing "it" blocks to output their errors._
