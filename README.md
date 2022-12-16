@@ -1,5 +1,3 @@
-[discord-shield]: https://img.shields.io/discord/836770519679762474.svg?logo=discord&colorB=7289DA
-[discord-url]: https://discord.gg/AtpTzcp4GY
 [marketplace-shield]: https://img.shields.io/visual-studio-marketplace/d/tacheometrist.testez-companion
 [marketplace-url]: https://marketplace.visualstudio.com/items?itemName=tacheometrist.testez-companion
 [license-shield]: https://img.shields.io/github/license/tacheometry/testez-companion
@@ -10,7 +8,6 @@
 # TestEZ Companion
 
 [![License][license-shield]][license-url]
-[![Discord Server][discord-shield]][discord-url]
 [![Visual Studio Marketplace][marketplace-shield]][marketplace-url]
 
 TestEZ Companion is a Visual Studio Code extension that enables Roblox developers to preview their [TestEZ](https://roblox.github.io/testez/) test results inside VS Code.
@@ -28,19 +25,20 @@ After getting the repository, run `npm i` to install all dependencies.
 
 Before compiling, running tests is highly encouraged. This is done through [Jasmine](https://jasmine.github.io).
 
-* To run tests once, run: `npm test`
-* To run tests in watch mode, run: `npm run test:watch`
+- To run tests once, run: `npm test`
+- To run tests in watch mode, run: `npm run test:watch`
 
 ### Compiling
 
 The VS Code extension uses [TypeScript](https://www.typescriptlang.org), and is then bundled with [webpack](https://webpack.js.org).
 
-* To compile once (in production mode), run: `npm run build`
-* To compile in watch mode, run `npm run watch`
+- To compile once (in production mode), run: `npm run build`
+- To compile in watch mode, run `npm run watch`
 
 ## Roblox Studio plugin
 
 Make sure to first initialize git submodules:
+
 ```
 git submodule init
 git submodule update
