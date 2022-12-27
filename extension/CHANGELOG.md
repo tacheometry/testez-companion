@@ -1,7 +1,7 @@
 ## 2.1.0
 
 -   Dependency updates.
--   Option to run tests automatically on save of `lua`/`luau` files.
+-   Option to run tests automatically on save of `lua`/`luau` files (with their respective options: `runTestsOnSave`, `runTestsOnSaveFilter`, `runTestsOnSaveDebounce`).
 -   Overall documentation updates.
 
 ## 2.0.0
