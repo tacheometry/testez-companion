@@ -1,7 +1,7 @@
 ## 2.1.0
 
 -   Dependency updates.
--   Option to run tests automatically on save of `lua`/`luau` files (with their respective options: `runTestsOnSave`, `runTestsOnSaveFilter`, `runTestsOnSaveDebounce`).
+-   Option to run tests automatically on save of certain files through the `runTestsOnSave` option. By default, `lua`, `luau`, and `json` files are detected, but a custom glob can be provided via `runTestsOnSaveFilter` if necessary, and the debounce window to run tests on save can be adjusted via `runTestsOnSaveDebounce`
 -   Overall documentation updates.
 
 ## 2.0.0
