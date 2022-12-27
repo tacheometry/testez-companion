@@ -79,6 +79,16 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Whether to run tests whenever a lua/luau file in the project is changed."
+				},
+				"testez-companion.runTestsOnSaveFilter": {
+					"type": "string",
+					"default": "**/*.{lua,luau,json}",
+					"description": "Glob pattern to use for detecting file changes. Used in running tests automatically when the runTestsOnSave option is enabled. Leave empty to detect .lua, .luau, and .json files all across the current workspace. Glob used: https://code.visualstudio.com/api/references/vscode-api#GlobPattern"
+				},
+				"testez-companion.runTestsOnSaveDebounce": {
+					"type": "number",
+					"default": 0.2,
+					"description": "The time (in seconds) for the \"run tests on save\" debounce. File saves within this window are ignored, and do not cause another test run."
 				}
 			}
 		},
