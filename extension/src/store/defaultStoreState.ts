@@ -5,5 +5,6 @@ const DEFAULT_STORE_STATE: IStoreState = {
 	lastTestResults: null,
 	selectedPlaceGUID: null,
 	lastAvailablePlaces: [],
+	lastAutoInvokedTestRun: null,
 };
 export default DEFAULT_STORE_STATE;

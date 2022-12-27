@@ -10,6 +10,7 @@ export interface IStoreState {
 	lastTestResults: TestEZ.ReporterOutput | null;
 	selectedPlaceGUID: PlaceGUID | null;
 	lastAvailablePlaces: PlaceList;
+	lastAutoInvokedTestRun: number | null;
 }
 
 export type IStoreAction =
@@ -39,4 +40,8 @@ export type IStoreAction =
 	| {
 			type: "LOG_ERRORS";
 			errors: string[];
+	  }
+	| {
+			type: "TEST_RUN_GOT_AUTO_INVOKED";
+			time: number;
 	  };

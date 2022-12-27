@@ -65,4 +65,16 @@ describe("reducer", () => {
 			).toEqual(places);
 		});
 	});
+	describe("TEST_RUN_GOT_AUTO_INVOKED", () => {
+		it("should memorize the auto invoked test run time", () => {
+			const testTime = Date.now();
+
+			expect(
+				reducer(DEFAULT_STORE_STATE, {
+					type: "TEST_RUN_GOT_AUTO_INVOKED",
+					time: testTime,
+				}).lastAutoInvokedTestRun
+			).toEqual(testTime);
+		});
+	});
 });

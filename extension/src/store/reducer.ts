@@ -39,6 +39,12 @@ const reducer: Reducer<IStoreState, IStoreAction> = (
 				lastAvailablePlaces: action.places,
 			};
 		}
+		case "TEST_RUN_GOT_AUTO_INVOKED": {
+			return {
+				...state,
+				lastAutoInvokedTestRun: action.time,
+			};
+		}
 		default: {
 			return state;
 		}
