@@ -17,17 +17,30 @@ import TestEZ from "./TestEZTypes";
 import reducer from "./store/reducer";
 import Log from "./LogServiceMessage";
 import fsWatcherCallback from "./vscode/fsWatcherCallback";
+import getGlobPatternPreference from "./vscode/preferences/getGlobPatternPreference";
+import getRunTestsOnSavePreference from "./vscode/preferences/getRunTestsOnSavePreference";
 
 export let store: Store<IStoreState, IStoreAction>;
 
-export async function activate(context: vscode.ExtensionContext) {
-	const outputChannel = vscode.window.createOutputChannel("TestEZ Companion");
-	const fsWatcher = vscode.workspace.createFileSystemWatcher(
-		"**/*.lua*",
+let fsWatcher: vscode.FileSystemWatcher | undefined;
+const refreshFsWatcher = () => {
+	fsWatcher?.dispose();
+	if (!getRunTestsOnSavePreference()) return;
+
+	const glob = getGlobPatternPreference();
+	fsWatcher = vscode.workspace.createFileSystemWatcher(
+		glob,
 		false,
 		false,
 		false
 	);
+	fsWatcher.onDidChange(fsWatcherCallback);
+	fsWatcher.onDidCreate(fsWatcherCallback);
+	fsWatcher.onDidDelete(fsWatcherCallback);
+};
+
+export async function activate(context: vscode.ExtensionContext) {
+	const outputChannel = vscode.window.createOutputChannel("TestEZ Companion");
 
 	const testTreeDataProviders: testSummaryTreeDataProvider[] = (
 		["Success", "Failure", "Skipped"] as const
@@ -71,12 +84,16 @@ export async function activate(context: vscode.ExtensionContext) {
 			)
 		),
 		outputChannel,
-		fsWatcher
+		vscode.workspace.onDidChangeConfiguration((e) => {
+			if (
+				e.affectsConfiguration(
+					"testez-companion.runTestsOnSaveFilter"
+				) ||
+				e.affectsConfiguration("testez-companion.runTestsOnSave")
+			)
+				refreshFsWatcher();
+		})
 	);
-
-	fsWatcher.onDidChange(fsWatcherCallback);
-	fsWatcher.onDidCreate(fsWatcherCallback);
-	fsWatcher.onDidDelete(fsWatcherCallback);
 
 	let progressBarPromiseResolver: (() => void) | undefined;
 	const stopProgressBar = () => progressBarPromiseResolver?.();
@@ -187,6 +204,10 @@ export async function activate(context: vscode.ExtensionContext) {
 	};
 
 	store = legacy_createStore(reducer, applyMiddleware(sideEffectMiddleware));
+
+	refreshFsWatcher();
 }
 
-export async function deactivate() {}
+export async function deactivate() {
+	fsWatcher?.dispose();
+}

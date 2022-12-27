@@ -7,7 +7,7 @@ import getWorkspaceFolder from "../getWorkspaceFolder";
 import httpTestResultProviderGenerator from "../../testResultProviders/httpTestResultProviderGenerator";
 import type TestRoots from "../../TestRoots";
 import { selectPlace } from "../selectPlace";
-import getTestTimeoutPreference from "../getTestTimeoutPreference";
+import getTestTimeoutPreference from "../preferences/getTestTimeoutPreference";
 
 const ajv = new Ajv();
 
