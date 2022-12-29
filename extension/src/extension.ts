@@ -28,6 +28,11 @@ const refreshFsWatcher = () => {
 	if (!getRunTestsOnSavePreference()) return;
 
 	const glob = getGlobPatternPreference();
+	if (glob === "")
+		return vscode.window.showWarningMessage(
+			'The runTestsOnSaveFilter has been set to "". The extension won\'t be able to detect any files changes; consider removing the property entirely for the default value to be used, or including a glob that captures the desired file names.'
+		);
+
 	fsWatcher = vscode.workspace.createFileSystemWatcher(
 		glob,
 		false,
