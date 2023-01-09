@@ -3,16 +3,27 @@ import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
 
-const copyPlugin = (source: string, destination: string) => {
-	fs.copyFile(source, destination, (err) => {
-		err
-			? vscode.window.showErrorMessage(
-					`An error occured while trying to copy the plugin to ${destination} (Error: ${err.message})`
-			  )
-			: vscode.window.showInformationMessage(
-					`Successfully copied the plugin to ${destination}`
-			  );
-	});
+const copyPlugin = async (source: string, destination: string) => {
+	const showError = (message: string) =>
+		vscode.window.showErrorMessage(
+			`An error occured while trying to copy the plugin to ${destination} (Error: ${message})`
+		);
+
+	await fs.promises
+		.mkdir(destination, {
+			recursive: true,
+		})
+		.catch((e) => {
+			if (e.code !== "EEXIST") showError(e.message);
+		});
+	fs.promises
+		.copyFile(source, destination)
+		.then(() =>
+			vscode.window.showInformationMessage(
+				`Successfully copied the plugin to ${destination}`
+			)
+		)
+		.catch((e) => showError(e.message));
 };
 
 export default async () => {
