@@ -1,3 +1,7 @@
+## 2.1.1
+
+-   Install command: Run mkdir before copying the plugin in case the `Plugins` folder does not exist.
+
 ## 2.1.0
 
 -   Dependency updates.
