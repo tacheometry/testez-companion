@@ -3,42 +3,40 @@ import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
 
-const copyPlugin = async (source: string, destination: string) => {
+const RBXMX_NAME = "TestEZ Companion.rbxmx";
+
+const copyPlugin = async (sourceFile: string, destinationDir: string) => {
 	const showError = (message: string) =>
 		vscode.window.showErrorMessage(
-			`An error occured while trying to copy the plugin to ${destination} (Error: ${message})`
+			`An error occured while trying to copy the plugin to ${destinationDir} (Error: ${message})`
 		);
+	const fullDestination = path.join(destinationDir, RBXMX_NAME);
 
 	await fs.promises
-		.mkdir(destination, {
+		.mkdir(destinationDir, {
 			recursive: true,
 		})
 		.catch((e) => {
 			if (e.code !== "EEXIST") showError(e.message);
 		});
 	fs.promises
-		.copyFile(source, destination)
+		.copyFile(sourceFile, fullDestination)
 		.then(() =>
 			vscode.window.showInformationMessage(
-				`Successfully copied the plugin to ${destination}`
+				`Successfully copied the plugin to ${fullDestination}`
 			)
 		)
 		.catch((e) => showError(e.message));
 };
 
 export default async () => {
-	const pluginPath = path.join(__dirname, "..", "TestEZ Companion.rbxmx");
+	const pluginPath = path.join(__dirname, "..", RBXMX_NAME);
 
 	switch (os.platform()) {
 		case "win32":
 			copyPlugin(
 				pluginPath,
-				path.join(
-					process.env["LOCALAPPDATA"]!,
-					"Roblox",
-					"Plugins",
-					"TestEZ Companion.rbxmx"
-				)
+				path.join(process.env["LOCALAPPDATA"]!, "Roblox", "Plugins")
 			);
 
 			break;
@@ -49,8 +47,7 @@ export default async () => {
 					process.env["HOME"]!,
 					"Documents",
 					"Roblox",
-					"Plugins",
-					"TestEZ Companion.rbxmx"
+					"Plugins"
 				)
 			);
 
@@ -58,18 +55,18 @@ export default async () => {
 		default:
 			const selected = await vscode.window.showErrorMessage(
 				"Could not install the plugin for this OS. Please install it yourself in your Roblox/Plugins folder.",
-				"Save .rbxmx"
+				"Select Plugins directory"
 			);
-			if (selected !== "Save .rbxmx") return;
+			if (selected !== "Select Plugins directory") return;
 
-			const location = await vscode.window.showSaveDialog({
-				filters: {
-					"Roblox XML Model Files": ["rbxmx"],
-				},
+			const location = await vscode.window.showOpenDialog({
+				canSelectFiles: false,
+				canSelectFolders: true,
+				canSelectMany: false,
 			});
-			if (!location) return;
+			if (!location || !location[0]) return;
 
-			copyPlugin(pluginPath, location.fsPath);
+			copyPlugin(pluginPath, location[0].path);
 
 			break;
 	}
