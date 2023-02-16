@@ -28,7 +28,7 @@ export default (
 			ping(`http://127.0.0.1:${port}`).then((status) => {
 				if (status === true)
 					reject(
-						"The port at http:127.0.0.1:28859 is already occupied!"
+						`The port at http://127.0.0.1:${port} is already occupied!`
 					);
 			});
 
