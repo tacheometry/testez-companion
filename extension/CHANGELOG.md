@@ -1,3 +1,9 @@
+## 2.1.2
+
+-   Fix install command creating a directory with the file name.
+-   Catch errors emitted by TestEZ and show a warning when this happens.
+-   "Open test error" on a failing test opens the Output tab.
+
 ## 2.1.1
 
 -   Install command: Run mkdir before copying the plugin in case the `Plugins` folder does not exist.
