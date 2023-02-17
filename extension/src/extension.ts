@@ -203,6 +203,8 @@ export async function activate(context: vscode.ExtensionContext) {
 						messageType: 3,
 					})
 				);
+
+				outputChannel.show(true);
 			}
 		}
 		return next(action);
