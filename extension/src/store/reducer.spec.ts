@@ -19,11 +19,17 @@ describe("reducer", () => {
 		it("should indicate we received test results", () => {
 			const newState = reducer(DEFAULT_STORE_STATE, {
 				type: "GOT_TEST_RESULTS",
-				results: SAMPLE_RESULTS,
+				results: {
+					reporterOutput: SAMPLE_RESULTS,
+					caughtTestEZError: false,
+				},
 			});
 
 			expect(newState.waitingForTestResults).toBeFalse();
-			expect(newState.lastTestResults).toEqual(SAMPLE_RESULTS);
+			expect(newState.lastTestResults).toEqual({
+				reporterOutput: SAMPLE_RESULTS,
+				caughtTestEZError: false,
+			});
 		});
 	});
 	describe("TESTING_FAILED", () => {

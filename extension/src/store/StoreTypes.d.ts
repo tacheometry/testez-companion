@@ -1,13 +1,13 @@
 import Log from "../LogServiceMessage";
-import TestEZ from "../TestEZTypes";
 import {
 	PlaceGUID,
 	PlaceList,
 } from "../testResultProviders/httpTestResultProviderGenerator";
+import TestResultProviderOutput from "../testResultProviders/TestResultProviderOutput";
 
 export interface IStoreState {
 	waitingForTestResults: boolean;
-	lastTestResults: TestEZ.ReporterOutput | null;
+	lastTestResults: TestResultProviderOutput | null;
 	selectedPlaceGUID: PlaceGUID | null;
 	lastAvailablePlaces: PlaceList;
 	lastAutoInvokedTestRun: number | null;
@@ -19,7 +19,7 @@ export type IStoreAction =
 	  }
 	| {
 			type: "GOT_TEST_RESULTS";
-			results: TestEZ.ReporterOutput;
+			results: TestResultProviderOutput;
 	  }
 	| {
 			type: "TESTING_FAILED";

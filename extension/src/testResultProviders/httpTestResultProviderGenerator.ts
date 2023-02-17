@@ -3,6 +3,7 @@ import Log from "../LogServiceMessage";
 import TestEZ from "../TestEZTypes";
 import ping from "../util/ping";
 import TestResultProviderExtraData from "./TestResultProviderExtraData";
+import TestResultProviderOutput from "./TestResultProviderOutput";
 
 // TODO: Standardize providers
 
@@ -24,7 +25,7 @@ export default (
 		extraData: TestResultProviderExtraData,
 		onLogReceived: (log: Log) => void
 	) =>
-		new Promise<TestEZ.ReporterOutput>((resolve, reject) => {
+		new Promise<TestResultProviderOutput>((resolve, reject) => {
 			ping(`http://127.0.0.1:${port}`).then((status) => {
 				if (status === true)
 					reject(
@@ -47,6 +48,7 @@ export default (
 			let selectedPlace: PlaceGUID | null;
 
 			let testResults!: TestEZ.ReporterOutput;
+			let caughtTestEZError = false;
 			let resolveTestResultPromise!: () => void;
 			const testResultPromise = new Promise<void>((resolve) => {
 				resolveTestResultPromise = resolve;
@@ -107,6 +109,9 @@ export default (
 							["place-guid"]: {
 								type: "string",
 							},
+							["caught-testez-error"]: {
+								type: "string",
+							},
 						},
 						required: ["place-guid"],
 					},
@@ -120,6 +125,8 @@ export default (
 						return reply.code(403).send();
 
 					testResults = request.body as TestEZ.ReporterOutput;
+					if (request.headers["caught-testez-error"] === "true")
+						caughtTestEZError = true;
 					resolveTestResultPromise();
 
 					reply.code(200).send();
@@ -178,6 +185,9 @@ export default (
 				await testResultPromise;
 				clearTimeout(timeoutId);
 				server.close();
-				resolve(testResults);
+				resolve({
+					reporterOutput: testResults,
+					caughtTestEZError,
+				});
 			}, 900);
 		});

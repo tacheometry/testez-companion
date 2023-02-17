@@ -28,14 +28,19 @@ local identifierHeaders = {
 }
 
 local reporter = {
-	report = function(results)
+	report = function(results, caughtFromTestEZ)
+		local Headers = {
+			["Content-Type"] = "application/json",
+			["place-guid"] = PlaceGUID,
+		}
+		if caughtFromTestEZ then
+			Headers["caught-testez-error"] = "true"
+		end
+
 		local ok, serverResponse = pcall(HttpService.RequestAsync, HttpService, {
 			Url = BASE_URL .. "/results",
 			Method = "POST",
-			Headers = {
-				["Content-Type"] = "application/json",
-				["place-guid"] = PlaceGUID,
-			},
+			Headers = Headers,
 			Body = HttpService:JSONEncode(extractUsefulKeys(results)),
 		})
 
@@ -56,7 +61,7 @@ while true do
 		Headers = identifierHeaders,
 	})
 
-	if serverResponse.StatusCode == 200 then
+	if ok and serverResponse.StatusCode == 200 then
 		local config = HttpService:JSONDecode(serverResponse.Body)
 		local roots = {}
 
@@ -90,9 +95,25 @@ while true do
 		end)
 		hotReload.flush()
 		local TestEZ = hotReload.require(script.Parent.TestEZ)
-		TestEZ.TestBootstrap:run(roots, reporter, config.testExtraOptions)
+		local testsOk, runnerError =
+			pcall(TestEZ.TestBootstrap.run, TestEZ.TestBootstrap, roots, reporter, config.testExtraOptions)
+		if not testsOk then
+			log(warn, "Caught an error from TestEZ:")
+			print(runnerError)
+		end
+
 		logServiceConnection:Disconnect()
 		logServiceConnection = nil
+
+		if not testsOk then
+			reporter.report({
+				children = {},
+				errors = { runnerError },
+				failureCount = 1,
+				skippedCount = 0,
+				successCount = 0,
+			}, true)
+		end
 	end
 
 	task.wait(POLLING_INTERVAL)

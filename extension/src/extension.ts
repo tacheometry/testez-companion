@@ -13,7 +13,6 @@ import runTestsCommand from "./vscode/commands/runTests";
 import selectPlaceCommand from "./vscode/commands/selectPlace";
 import openTestErrorCommand from "./vscode/commands/openTestError";
 import testSummaryTreeDataProvider from "./vscode/testSummaryTreeDataProvider";
-import TestEZ from "./TestEZTypes";
 import reducer from "./store/reducer";
 import Log from "./LogServiceMessage";
 import fsWatcherCallback from "./vscode/fsWatcherCallback";
@@ -146,17 +145,17 @@ export async function activate(context: vscode.ExtensionContext) {
 				break;
 			}
 			case "GOT_TEST_RESULTS": {
-				const results = action.results as TestEZ.ReporterOutput;
+				const { results } = action;
 				console.log("Got TestEZ results:");
 				console.log(results);
 
 				stopProgressBar();
 				testTreeDataProviders.forEach((provider) => {
-					provider.data = results;
+					provider.data = results.reporterOutput;
 				});
 				treeRefreshers.forEach((emitter) => emitter.fire());
 
-				results.errors.forEach((error) => {
+				results.reporterOutput.errors.forEach((error) => {
 					outputConsoleMessage({
 						message: error
 							.split("\n")
@@ -171,14 +170,19 @@ export async function activate(context: vscode.ExtensionContext) {
 
 				outputChannel.appendLine("\nTest statistics:");
 				outputChannel.appendLine(
-					`✅ Success count:\t${results.successCount}`
+					`✅ Success count:\t${results.reporterOutput.successCount}`
 				);
 				outputChannel.appendLine(
-					`❌ Failure count:\t${results.failureCount}`
+					`❌ Failure count:\t${results.reporterOutput.failureCount}`
 				);
 				outputChannel.append(
-					`⏭ Skip count:\t\t${results.skippedCount}`
+					`⏭ Skip count:\t\t${results.reporterOutput.skippedCount}`
 				);
+
+				if (results.caughtTestEZError)
+					vscode.window.showWarningMessage(
+						"Testing could not be completed because TestEZ threw an error. This is usually caused by invalid return types for spec files or syntax errors."
+					);
 
 				break;
 			}

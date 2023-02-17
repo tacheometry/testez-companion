@@ -122,10 +122,10 @@ export default async (runAutomatically?: boolean) => {
 			});
 		}
 	)
-		.then((testResults) => {
+		.then((output) => {
 			store.dispatch({
 				type: "GOT_TEST_RESULTS",
-				results: testResults,
+				results: output,
 			});
 		})
 		.catch((rejectReason) => {

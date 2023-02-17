@@ -3,7 +3,6 @@ import httpTestResultProviderGenerator from "./httpTestResultProviderGenerator";
 
 import ping from "../util/ping";
 import delay from "../util/delay";
-import TestEZ from "../TestEZTypes";
 import axios from "axios";
 import TestResultProviderExtraData from "./TestResultProviderExtraData";
 
@@ -96,7 +95,10 @@ describe("the httpTestResultProvider server", () => {
 			data: PAYLOAD,
 		});
 
-		expect(await results).toEqual(PAYLOAD);
+		expect(await results).toEqual({
+			reporterOutput: PAYLOAD,
+			caughtTestEZError: false,
+		});
 	});
 
 	it("should be stopped after receiving results", async () => {
