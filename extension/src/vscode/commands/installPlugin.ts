@@ -3,14 +3,15 @@ import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
 
-const RBXMX_NAME = "TestEZ Companion.rbxmx";
+const RBXM_NAME = "TestEZ_Companion.rbxm";
 
 const copyPlugin = async (sourceFile: string, destinationDir: string) => {
 	const showError = (message: string) =>
 		vscode.window.showErrorMessage(
 			`An error occured while trying to copy the plugin to ${destinationDir} (Error: ${message})`
 		);
-	const fullDestination = path.join(destinationDir, RBXMX_NAME);
+	const fullDestination = path.join(destinationDir, RBXM_NAME);
+	const oldPlugin = path.join(destinationDir, "TestEZ Companion.rbxmx");
 
 	await fs.promises
 		.mkdir(destinationDir, {
@@ -21,6 +22,10 @@ const copyPlugin = async (sourceFile: string, destinationDir: string) => {
 		});
 	fs.promises
 		.copyFile(sourceFile, fullDestination)
+		.then(() => fs.promises.rm(oldPlugin))
+		.catch((e) => {
+			if (e.code !== "ENOENT") showError(e.message);
+		})
 		.then(() =>
 			vscode.window.showInformationMessage(
 				`Successfully copied the plugin to ${fullDestination}`
@@ -30,7 +35,7 @@ const copyPlugin = async (sourceFile: string, destinationDir: string) => {
 };
 
 export default async () => {
-	const pluginPath = path.join(__dirname, "..", RBXMX_NAME);
+	const pluginPath = path.join(__dirname, "..", RBXM_NAME);
 
 	switch (os.platform()) {
 		case "win32":

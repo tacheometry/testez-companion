@@ -1,3 +1,7 @@
+## 2.1.3
+
+-   Now using a `rbxm` file for the plugin instead of `rbxmx`.
+
 ## 2.1.2
 
 -   Fix install command creating a directory with the file name.
