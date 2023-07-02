@@ -80,6 +80,7 @@ while true do
 			end
 		end
 
+		LogService:ClearOutput()
 		logServiceConnection = LogService.MessageOut:Connect(function(message, messageType)
 			pcall(HttpService.RequestAsync, HttpService, {
 				Url = BASE_URL .. "/logs",
