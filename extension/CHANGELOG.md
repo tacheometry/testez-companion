@@ -1,3 +1,8 @@
+## 2.1.4
+
+-   Clear Studio Output before running tests (thanks to Sasial).
+-   Updated dependencies.
+
 ## 2.1.3
 
 -   Now using a `rbxm` file for the plugin instead of `rbxmx`.
