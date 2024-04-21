@@ -13,6 +13,10 @@
 TestEZ Companion is a Visual Studio Code extension that enables Roblox developers to preview their [TestEZ](https://roblox.github.io/testez/) test results inside VS Code.
 ![](https://user-images.githubusercontent.com/39647014/115806038-bdfdc180-a3ee-11eb-9c7c-f85b4491a8bc.png)
 
+## CLI
+
+A community made project for CLI usage is available: https://github.com/jackTabsCode/testez-companion-cli
+
 # Contributing
 
 ## VS Code extension
